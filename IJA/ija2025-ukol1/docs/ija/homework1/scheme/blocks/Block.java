@@ -84,6 +84,8 @@ public abstract class Block {
         outputPort.setValue(result);
     }
 
+    protected abstract double compute(Map<String, Double> inputs);
+
     /**
      * Umožní nastavit interní hodnotu bloku, která se následně propaguje přes výstupní port.
      * Má význam pouze pro některé bloky, implicitní implementace generuje výjimku. Odvozené třídy musí přepsat, pokud metodu potřebují.

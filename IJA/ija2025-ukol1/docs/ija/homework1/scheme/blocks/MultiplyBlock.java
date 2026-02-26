@@ -19,4 +19,9 @@ public class MultiplyBlock extends Block {
      */
     public MultiplyBlock(String name) { super(name, "a", "b"); }
 
+    @Override
+    protected double compute(Map<String, Double> inputs){
+        return inputs.get("a") * inputs.get("b");
+    }
+
 }

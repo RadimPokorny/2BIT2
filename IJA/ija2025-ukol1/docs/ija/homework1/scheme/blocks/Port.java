@@ -23,6 +23,11 @@ public abstract class Port {
     /** Blok, kterému port patří */
     private Block owner;
 
+    public Port(String name, Block owner){
+        this.name = name;
+        this.owner = owner;
+    }
+
     /**
      * Vstupní port bloku.
      * Přijímá hodnotu z výstupního portu jiného bloku, po každém přijetí vyvolá přepočet svého bloku ({@link Block#calculate()}).
@@ -31,6 +36,10 @@ public abstract class Port {
 
         private Double value = 0.0; // poslední přijatá hodnota
         private OutputPort source;
+
+        public InputPort(String name, Block owner){
+            super(name, owner);
+        }
 
         /**
          * Připojí vstupní port na výstupní blok zadaného bloku.
@@ -54,6 +63,10 @@ public abstract class Port {
 
         private double value;
         private List<InputPort> connections = new ArrayList<>();
+
+        public OutputPort(String name, Block owner){
+            super(name, owner);
+        }
 
         /**
          * Vrátí aktuální hodnotu výstupního portu. 

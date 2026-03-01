@@ -1,0 +1,27 @@
+# Python - virtuální prostředí
+.venv/
+venv/
+ENV/
+env/
+
+# Python - mezipaměť (cache)
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE - PyCharm / VS Code
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docker
+.dockerignore
+
+# OS soubory
+.DS_Store
+Thumbs.db
+
+# Projektové lokální XML (pokud je nechceš v gitu)
+*.xml
+!parser_output_schema.xsd  # Pokud chceš zachovat schéma, ale ignorovat generované výstupy

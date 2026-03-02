@@ -1,14 +1,12 @@
 class Main : Object {
-  run [ |
-    "Vytvoření atributu 'cislo' - výsledek přiřadíme do '_'"
-    _ := self cislo: 20.
-
-    "Přiřazení do lokální proměnné 'vysl' - ta vznikne tímto řádkem"
-    vysl := (self cislo) plus: 6.
-
-    "Výpis - opět musí být součástí přiřazení"
-    _ := 'Vysledek je: ' print.
-    _ := (vysl asString) print.
-    _ := '\n' print.
-  ]
-}
+run [|
+    a := self foo: 4. "a = instance 14"
+    b := [ :x | _ := 42. ]. "b = instance Block"
+    c := b value: 16. "c = instance 42"
+    d := 'ahoj' print.] "d = instance 'ahoj' - print vrací self, viz Vestavěné
+    třídy"
+    foo: [ :x |
+    "s proměnnou 'u' se nijak dál nepracuje, ale výsledek zaslání
+    zprávy 'plus:' bude vrácen jako výsledek volání metody 'foo'"
+    u := x plus: 10.
+]}

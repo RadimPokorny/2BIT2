@@ -1,7 +1,6 @@
 import logging
 from pathlib import Path
 from typing import TextIO
-
 from lxml import etree
 from lxml.etree import ParseError
 from pydantic import ValidationError
@@ -22,123 +21,168 @@ class Interpreter:
         try:
             xml_tree = etree.parse(source_file_path)
             self.current_program = Program.from_xml_tree(xml_tree.getroot())
-        except ParseError:
+        except (ParseError, etree.XMLSyntaxError):
             raise InterpreterError(ErrorCode.INT_XML, "Invalid XML")
         except ValidationError:
             raise InterpreterError(ErrorCode.INT_STRUCTURE, "Invalid SOL-XML structure")
 
+    def _create_obj(self, class_name: str, value=None):
+        """Pomocná metoda pro konzistentní vytváření objektů."""
+        return {"class": class_name, "attrs": {}, "val": value}
+
     def call_method(self, receiver, selector, args):
-        # --- Třída String ---
-        if receiver["class"] == "String":
+        r_cls = receiver.get("class")
+
+        # --- Třídní zprávy (Konstruktory) ---
+        if receiver.get("is_class"):
+            if selector == "from:":
+                return self._create_obj(r_cls, args[0].get("val"))
+            if selector == "new":
+                return self._create_obj(r_cls, None)
+            raise InterpreterError(ErrorCode.SEM_UNDEF, f"Class {r_cls} does not understand {selector}")
+
+        # --- 1. Metody třídy Object (Společné pro vše) ---
+        if selector == "identicalTo:":
+            res = (receiver is args[0])
+            return self._create_obj("True" if res else "False", res)
+
+        # --- 2. Metody třídy String ---
+        if r_cls == "String":
             if selector == "print":
-                # Specifikace 2: Vytiskne řetězec bez formátovacích znaků
-                print(str(receiver["val"]), end="", flush=True)
-                # Specifikace 2: Vrací self
+                out = str(receiver.get("val", "")).replace('\\n', '\n').replace('\\t', '\t')
+                print(out, end="", flush=True)
                 return receiver
-            if selector == "asInteger":
-                try:
-                    return {"class": "Integer", "attrs": {}, "val": int(receiver["val"])}
-                except:
-                    return {"class": "Nil", "attrs": {}, "val": None}
             if selector == "asString":
                 return receiver
 
-        # --- Třída Integer ---
-        if receiver["class"] == "Integer":
+        # --- 3. Native Integer Methods ---
+        if r_cls == "Integer" or self._is_subclass(r_cls, "Integer"):
             if selector == "plus:":
-                res = int(receiver["val"]) + int(args[0]["val"])
-                return {"class": "Integer", "attrs": {}, "val": res}
+                v1, v2 = receiver.get("val", 0), args[0].get("val", 0)
+                return self._create_obj("Integer", int(v1) + int(v2))
+
+            if selector == "equalTo:":
+                res = str(receiver.get("val")) == str(args[0].get("val"))
+                return self._create_obj("True" if res else "False", res)
+
             if selector == "asString":
-                return {"class": "String", "attrs": {}, "val": str(receiver["val"])}
+                return self._create_obj("String", str(receiver.get("val")))
 
-        # --- Podmínky (ifTrue:ifFalse:) ---
-        if receiver["class"] in ["True", "False"]:
+            # IMPLEMENTACE timesRepeat:
+            if selector == "timesRepeat:":
+                n = int(receiver.get("val", 0))
+                block_obj = args[0]
+                last_res = self._create_obj("Nil")
+                for i in range(1, n + 1):
+                    iter_num = self._create_obj("Integer", i)
+                    # Bloky v SOL26 se spouštějí zprávami value, value: atd.
+                    last_res = self.call_method(block_obj, "value:", [iter_num])
+                return last_res
+
+        # --- 4. Native Block Methods (Spouštění bloků) ---
+        if r_cls == "Block":
+            if selector.startswith("value"):
+                block_data = receiver["val"]  # Obsahuje {'node': ..., 'captured_self': ...}
+                block_node = block_data['node']
+                captured_self = block_data['captured_self']
+
+                # Kontrola arity (počet dvojteček v selectoru vs parametry v XML)
+                expected_arity = len(block_node.parameters) if block_node.parameters else 0
+                if len(args) != expected_arity:
+                    raise InterpreterError(ErrorCode.INT_DNU, f"Block expects {expected_arity} args, got {len(args)}")
+
+                return self.execute_block(block_node, captured_self, args)
+
+        # --- 5. Native Boolean Methods ---
+        if r_cls in ["True", "False"]:
             if selector == "ifTrue:ifFalse:":
-                # args[0] je blok pro True, args[1] pro False
-                chosen_block_obj = args[0] if receiver["class"] == "True" else args[1]
-                # Spustíme vnitřek bloku (v modelu je to pod .val)
-                return self.execute_block(chosen_block_obj["val"], receiver, [])
+                block_to_exec = args[0] if r_cls == "True" else args[1]
+                # Bloky jsou objekty, musíme je "spustit" přes jejich vnitřní uzel
+                return self.call_method(block_to_exec, "value", [])
+            if selector == "asString":
+                return self._create_obj("String", r_cls.lower())
 
-        # --- Standardní Lookup ---
-        curr_name = receiver["class"]
-        method_def = None
+        # --- 6. Standardní lookup v uživatelských třídách ---
+        curr_name = r_cls
         while curr_name:
-            curr_def = self.classes.get(curr_name)
-            if not curr_def: break
-            found = next((m for m in curr_def.methods if m.selector == selector), None)
-            if found:
-                method_def = found
-                break
-            curr_name = curr_def.parent
+            cls_def = self.classes.get(curr_name)
+            if not cls_def: break
+            method = next((m for m in cls_def.methods if m.selector == selector), None)
+            if method:
+                return self.execute_block(method.block, receiver, args)
+            curr_name = cls_def.parent
 
-        if not method_def:
-            # Gettery / Settery
-            if selector.endswith(":"):
-                receiver["attrs"][selector[:-1]] = args[0]
-                return receiver
-            elif selector in receiver["attrs"]:
-                return receiver["attrs"][selector]
-            raise InterpreterError(ErrorCode.INT_DNU, f"Method {selector} not found")
+        # --- 7. Atributy (Getters / Setters) ---
+        if selector.endswith(":"):
+            attr_name = selector[:-1]
+            receiver.setdefault("attrs", {})[attr_name] = args[0]
+            return receiver
+        if selector in receiver.get("attrs", {}):
+            return receiver["attrs"][selector]
 
-        return self.execute_block(method_def.block, receiver, args)
+        raise InterpreterError(ErrorCode.INT_DNU, f"Method {selector} not found for class {r_cls}")
+
+    def _is_subclass(self, child, parent):
+        curr = child
+        while curr:
+            if curr == parent: return True
+            cls_def = self.classes.get(curr)
+            curr = cls_def.parent if cls_def else None
+        return False
 
     def evaluate_expr(self, expr_node, variables: dict):
         if expr_node.literal:
-            return {"class": expr_node.literal.class_id, "attrs": {}, "val": expr_node.literal.value}
+            lit = expr_node.literal
+            if lit.class_id == "class":
+                return {"class": lit.value, "is_class": True, "val": lit.value}
+            val = int(lit.value) if lit.class_id == "Integer" else lit.value
+            return self._create_obj(lit.class_id, val)
 
         if expr_node.var:
             name = expr_node.var.name
             if name in ["nil", "true", "false"]:
-                # Mapujeme SOL názvy na naše třídy
-                cls = name.capitalize()
-                return {"class": cls, "attrs": {}, "val": (name == "true")}
-            if name in variables: return variables[name]
-            raise InterpreterError(ErrorCode.SEM_UNDEF, f"Var {name} undef")
+                return self._create_obj(name.capitalize(), (name == "true"))
+            if name in variables:
+                return variables[name]
+            if name in self.classes or name in ["Integer", "String", "Object", "Nil", "True", "False", "Block"]:
+                return {"class": name, "is_class": True, "val": name}
+            raise InterpreterError(ErrorCode.SEM_UNDEF, f"Variable {name} not defined")
 
         if expr_node.block:
-            # TADY JE ZMĚNA: Blok nevykonáme, ale zabalíme ho jako objekt "Block"
-            # aby se dal předat do ifTrue:ifFalse:
-            return {"class": "Block", "attrs": {}, "val": expr_node.block}
+            # DŮLEŽITÉ: Blok si musí zapamatovat 'self' z aktuálního kontextu (Closure)
+            block_info = {
+                'node': expr_node.block,
+                'captured_self': variables.get('self')
+            }
+            return self._create_obj("Block", block_info)
 
         if expr_node.send:
             s = expr_node.send
-            # Rekurzivní vyhodnocení (vnořené zprávy)
             recv = self.evaluate_expr(s.receiver, variables)
             actual_args = [self.evaluate_expr(a.expr, variables) for a in s.args]
             return self.call_method(recv, s.selector, actual_args)
 
-        return {"class": "Nil", "attrs": {}, "val": None}
+        return self._create_obj("Nil")
 
     def execute_block(self, block_node, self_obj, args):
-        # Parametry bloku jsou v variables od začátku
         variables = {"self": self_obj}
         if block_node.parameters:
             for i, p in enumerate(block_node.parameters):
                 variables[p.name] = args[i]
 
-        last_value = {"class": "Nil", "attrs": {}, "val": None}
-
-        # SOL26: sekvence PŘÍKAZŮ PŘIŘAZENÍ
+        last_v = self._create_obj("Nil")
         for assign in block_node.assigns:
-            # 1. Vyhodnotíme pravou stranu (výraz)
             val = self.evaluate_expr(assign.expr, variables)
-
-            # 2. Uložíme do levé strany (target)
-            target_name = assign.target.name
-            if target_name != '_':  # Podle 1.1 specifikace se do '_' sice přiřazuje, ale dál se nepoužívá
-                variables[target_name] = val
-
-            # 3. Zapamatujeme si poslední hodnotu pro návrat z bloku (sekce 1.2.6)
-            last_value = val
-
-        return last_value
+            if assign.target.name != "_":
+                variables[assign.target.name] = val
+            last_v = val
+        return last_v
 
     def execute(self, input_io: TextIO) -> None:
         if not self.current_program: return
         self.classes = {cls.name: cls for cls in self.current_program.classes}
-
         if "Main" not in self.classes:
             raise InterpreterError(ErrorCode.SEM_MAIN, "Main class missing")
 
-        main_instance = {"class": "Main", "attrs": {}, "val": None}
-        self.call_method(main_instance, "run", [])
+        main_inst = self._create_obj("Main")
+        self.call_method(main_inst, "run", [])

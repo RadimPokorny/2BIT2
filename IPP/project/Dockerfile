@@ -4,7 +4,6 @@ WORKDIR /src
 COPY requirements.txt ./
 COPY int/requirements-dev.txt ./
 RUN pip install --no-cache-dir -r requirements.txt -r requirements-dev.txt
-# Tady SMAŽEME "COPY . .", soubory tam budeme sypat přes Volume z PyCharmu
 ENTRYPOINT ["/bin/bash"]
 
 # --- build ---

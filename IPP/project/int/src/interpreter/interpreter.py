@@ -27,13 +27,13 @@ class Interpreter:
             raise InterpreterError(ErrorCode.INT_STRUCTURE, "Invalid SOL-XML structure")
 
     def _create_obj(self, class_name: str, value=None):
-        """Pomocná metoda pro konzistentní vytváření objektů."""
+        """Create object method for a better coding experience."""
         return {"class": class_name, "attrs": {}, "val": value}
 
     def call_method(self, receiver, selector, args):
         r_cls = receiver.get("class")
 
-        # --- Třídní zprávy (Konstruktory) ---
+        # --- Class constructors ---
         if receiver.get("is_class"):
             if selector == "from:":
                 return self._create_obj(r_cls, args[0].get("val"))
@@ -41,12 +41,12 @@ class Interpreter:
                 return self._create_obj(r_cls, None)
             raise InterpreterError(ErrorCode.SEM_UNDEF, f"Class {r_cls} does not understand {selector}")
 
-        # --- 1. Metody třídy Object (Společné pro vše) ---
+        # --- Object class methods ---
         if selector == "identicalTo:":
             res = (receiver is args[0])
             return self._create_obj("True" if res else "False", res)
 
-        # --- 2. Metody třídy String ---
+        # --- String class methods ---
         if r_cls == "String":
             if selector == "print":
                 out = str(receiver.get("val", "")).replace('\\n', '\n').replace('\\t', '\t')
@@ -57,43 +57,46 @@ class Interpreter:
 
         # --- 3. Native Integer Methods ---
         if r_cls == "Integer" or self._is_subclass(r_cls, "Integer"):
+            
+            # Arithmetic operator plus
             if selector == "plus:":
                 v1, v2 = receiver.get("val", 0), args[0].get("val", 0)
                 return self._create_obj("Integer", int(v1) + int(v2))
 
+            # Equation operator
             if selector == "equalTo:":
                 res = str(receiver.get("val")) == str(args[0].get("val"))
                 return self._create_obj("True" if res else "False", res)
 
+            # Convert to string method
             if selector == "asString":
                 return self._create_obj("String", str(receiver.get("val")))
 
-            # IMPLEMENTACE timesRepeat:
+            # Cycle:
             if selector == "timesRepeat:":
                 n = int(receiver.get("val", 0))
                 block_obj = args[0]
                 last_res = self._create_obj("Nil")
                 for i in range(1, n + 1):
                     iter_num = self._create_obj("Integer", i)
-                    # Bloky v SOL26 se spouštějí zprávami value, value: atd.
                     last_res = self.call_method(block_obj, "value:", [iter_num])
                 return last_res
 
-        # --- 4. Native Block Methods (Spouštění bloků) ---
+        # --- 4. Native Block Methods ---
         if r_cls == "Block":
             if selector.startswith("value"):
-                block_data = receiver["val"]  # Obsahuje {'node': ..., 'captured_self': ...}
+                block_data = receiver["val"] 
                 block_node = block_data['node']
                 captured_self = block_data['captured_self']
 
-                # Kontrola arity (počet dvojteček v selectoru vs parametry v XML)
+                # Arity check
                 expected_arity = len(block_node.parameters) if block_node.parameters else 0
                 if len(args) != expected_arity:
                     raise InterpreterError(ErrorCode.INT_DNU, f"Block expects {expected_arity} args, got {len(args)}")
 
                 return self.execute_block(block_node, captured_self, args)
 
-        # --- 5. Native Boolean Methods ---
+        # --- Native Boolean Methods ---
         if r_cls in ["True", "False"]:
             if selector == "ifTrue:ifFalse:":
                 block_to_exec = args[0] if r_cls == "True" else args[1]
@@ -102,7 +105,7 @@ class Interpreter:
             if selector == "asString":
                 return self._create_obj("String", r_cls.lower())
 
-        # --- 6. Standardní lookup v uživatelských třídách ---
+        # --- Lookup in class hierarchy ---
         curr_name = r_cls
         while curr_name:
             cls_def = self.classes.get(curr_name)
@@ -112,7 +115,7 @@ class Interpreter:
                 return self.execute_block(method.block, receiver, args)
             curr_name = cls_def.parent
 
-        # --- 7. Atributy (Getters / Setters) ---
+        # --- Getters and setters ---
         if selector.endswith(":"):
             attr_name = selector[:-1]
             receiver.setdefault("attrs", {})[attr_name] = args[0]
@@ -123,6 +126,8 @@ class Interpreter:
         raise InterpreterError(ErrorCode.INT_DNU, f"Method {selector} not found for class {r_cls}")
 
     def _is_subclass(self, child, parent):
+        """Check if 'child' class is a subclass of 'parent' class."""
+        
         curr = child
         while curr:
             if curr == parent: return True
@@ -131,6 +136,8 @@ class Interpreter:
         return False
 
     def evaluate_expr(self, expr_node, variables: dict):
+        """Evaluate an expression node and return its value."""
+        
         if expr_node.literal:
             lit = expr_node.literal
             if lit.class_id == "class":
@@ -149,7 +156,7 @@ class Interpreter:
             raise InterpreterError(ErrorCode.SEM_UNDEF, f"Variable {name} not defined")
 
         if expr_node.block:
-            # DŮLEŽITÉ: Blok si musí zapamatovat 'self' z aktuálního kontextu (Closure)
+            # Saving the block node and captured self in the block object for later execution
             block_info = {
                 'node': expr_node.block,
                 'captured_self': variables.get('self')
@@ -165,6 +172,8 @@ class Interpreter:
         return self._create_obj("Nil")
 
     def execute_block(self, block_node, self_obj, args):
+        """Execute a block of code with given self and arguments."""
+        
         variables = {"self": self_obj}
         if block_node.parameters:
             for i, p in enumerate(block_node.parameters):
@@ -179,6 +188,7 @@ class Interpreter:
         return last_v
 
     def execute(self, input_io: TextIO) -> None:
+        
         if not self.current_program: return
         self.classes = {cls.name: cls for cls in self.current_program.classes}
         if "Main" not in self.classes:

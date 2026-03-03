@@ -100,7 +100,7 @@ class Interpreter:
         if r_cls in ["True", "False"]:
             if selector == "ifTrue:ifFalse:":
                 block_to_exec = args[0] if r_cls == "True" else args[1]
-                # Bloky jsou objekty, musíme je "spustit" přes jejich vnitřní uzel
+                # Blocks are executed with no arguments, so we can directly call them here
                 return self.call_method(block_to_exec, "value", [])
             if selector == "asString":
                 return self._create_obj("String", r_cls.lower())

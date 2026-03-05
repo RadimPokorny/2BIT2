@@ -21,6 +21,13 @@ from .input_model import Program
 
 logger = logging.getLogger(__name__)
 
+class DummyNode:
+    """
+    Dummy node for program testing purposes.
+    """
+    def __init__(self):
+        self.parameters = []
+        self.assigns = []
 
 class Environment:
     """
@@ -151,8 +158,7 @@ class Interpreter:
             if r_cls == "Nil":
                 return self.nil_obj
             if r_cls == "Block":
-                from unittest.mock import MagicMock
-                dummy_node = MagicMock(parameters=[], assigns=[])
+                dummy_node = DummyNode()
                 return self._create_obj(
                     "Block",
                     {
@@ -523,24 +529,23 @@ class Interpreter:
         new_env = Environment(parent=captured_env)
 
         # Fulfill the parameters (Error 51 check implicitly done by XML structure)
-        # Naplnění parametrů
         if block_node.parameters:
             for i, p in enumerate(block_node.parameters):
                 new_env.values[p.name] = args[i]
                 new_env.params.add(p.name)
 
-        # Výchozí hodnota je nil (pokud blok nemá žádné příkazy)
+        # value is nil if there are no commands in the block
         last_v = self.nil_obj
 
         for assign in block_node.assigns:
-            # Vyhodnotíme pravou stranu
+            # Evaluate the right side of the expression
             val = self.evaluate_expr(assign.expr, new_env, defining_class=defining_class)
 
-            # Přiřadíme do cíle (pokud to není zahazovací '_')
+            # assign to the target
             if assign.target.name != "_":
                 new_env.assign(assign.target.name, val)
 
-            # Poslední vyhodnocený výraz se stává výsledkem bloku
+            # Last expression is the result
             last_v = val
 
         return last_v

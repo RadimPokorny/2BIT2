@@ -1,47 +1,43 @@
-class Parent : Object {
-    init [| _ := self secret: 'ParentSecret'. ]
-    getSecret [| _ := self secret. ]
-    whoAmI [| _ := 'I am Parent'. ]
-}
-
-class Child : Parent {
+class Model : Object {
     init [|
-        _ := super init.
-        _ := self secret: 'ChildSecret'.
+        "Změněno na 'name', aby nebyla kolize s metodou 'jmeno'"
+        _ := (self name: 'Puvodni').
+        _ := (self hodnota: 100).
     ]
-    whoAmI [| _ := 'I am Child'. ]
-    testSuper [|
-        _ := 'Child says: ' print.
-        _ := (self whoAmI) print.
-        _ := '\nParent says: ' print.
-        _ := (super whoAmI) print.
-    ]
-    makeClosure: [ :val |
-        _ := [ :extra |
-            _ := ((val concatenateWith: ' ') concatenateWith: extra).
-        ].
+
+    jmeno [|
+        _ := 'Metoda jmeno'.
     ]
 }
 
 class Main : Object {
     run [|
-        _ := '--- TEST 1 ---\n' print.
-        c := Child new.
-        _ := c init.
-        _ := c testSuper.
-        _ := '\n' print.
+        _ := ('--- TEST START ---\n') print.
 
-        _ := '--- TEST 2 ---\n' print.
-        block := c makeClosure: 'Hello'.
-        result := block value: 'World'.
-        _ := 'Closure result: ' print.
-        _ := result print.
-        _ := '\n' print.
+        m1 := (Model new).
+        _ := (m1 init).
 
-        _ := '--- TEST 3 ---\n' print.
-        _ := 'nil identicalTo: nil: ' print.
-        isSame := (nil identicalTo: nil).
-        _ := (isSame asString) print.
-        _ := '\n' print.
+        m2 := (Model from: m1).
+
+        _ := ('Metoda m2 jmeno: ') print.
+        _ := (m2 jmeno) print.
+        _ := ('\n') print.
+
+        _ := ('Atribut m2 name: ') print.
+        _ := (m2 name) print.
+        _ := ('\n') print.
+
+        _ := ('Atribut m2 hodnota: ') print.
+        _ := ((m2 hodnota) asString) print.
+        _ := ('\n') print.
+
+        "startsWith:endsBefore: test"
+        s := 'VUTBRNO'.
+        sub := (s startsWith: 1 endsBefore: 4).
+        _ := ('Substring (VUT): ') print.
+        _ := (sub print).
+        _ := ('\n') print.
+
+        _ := ('--- TEST END ---\n') print.
     ]
 }

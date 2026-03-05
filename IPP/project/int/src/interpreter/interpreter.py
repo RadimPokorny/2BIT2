@@ -4,7 +4,7 @@ This module contains the main logic of the interpreter.
 IPP: You must definitely modify this file. Bend it to your will.
 
 Author: Ondřej Ondryáš <iondryas@fit.vut.cz>
-Author:
+Author: Radim Pokorný <xpokorr00@stud.fit.vut.cz>
 """
 
 import logging
@@ -21,23 +21,26 @@ from .input_model import Program
 
 logger = logging.getLogger(__name__)
 
+
 class DummyNode:
     """
     Dummy node for program testing purposes.
     """
+
     def __init__(self):
         self.parameters = []
         self.assigns = []
+
 
 class Environment:
     """
     The main environment of the interpreter.
     """
 
-    def __init__(self, parent=None):
-        self.values: dict = {}
-        self.parent: Environment = parent
-        self.params: set = set()  # Error 34 handle (assign to the parameter)
+    def __init__(self, parent: "Environment | None" = None) -> None:
+        self.values: dict[str, Any] = {}
+        self.parent: Environment | None = parent
+        self.params: set[str] = set()  # Error 34 handle (assign to the parameter)
 
     def lookup(self, name: str):
         """Lookup for the variable by name in current and parent scopes."""
@@ -51,7 +54,7 @@ class Environment:
     def assign(self, name: str, value):
         """Update an existing variable in the scope or create a new one in the current scope."""
         # Check if we are trying to assign to a formal parameter (Error 34)
-        curr = self
+        curr: Environment | None = self
         while curr:
             if name in curr.values:
                 if name in curr.params:
@@ -74,10 +77,10 @@ class Interpreter:
     def __init__(self) -> None:
         self.current_program: Program | None = None
         self.classes: dict = {}
-        # Useful skeletons
-        self.nil_obj = {"class": "Nil", "attrs": {}, "val": None}
-        self.true_obj = {"class": "True", "attrs": {}, "val": True}
-        self.false_obj = {"class": "False", "attrs": {}, "val": False}
+        # Explicit type annotation for skeletons
+        self.nil_obj: dict[str, Any] = {"class": "Nil", "attrs": {}, "val": None}
+        self.true_obj: dict[str, Any] = {"class": "True", "attrs": {}, "val": True}
+        self.false_obj: dict[str, Any] = {"class": "False", "attrs": {}, "val": False}
 
     def load_program(self, source_file_path: Path) -> None:
         """
@@ -141,10 +144,10 @@ class Interpreter:
             source_obj = args[0]
             source_val = source_obj.get("val")
             needs_val = (
-                    r_cls == "Integer"
-                    or self._is_subclass(r_cls, "Integer")
-                    or r_cls == "String"
-                    or r_cls == "Block"
+                r_cls == "Integer"
+                or self._is_subclass(r_cls, "Integer")
+                or r_cls == "String"
+                or r_cls == "Block"
             )
             if needs_val and source_val is None:
                 raise InterpreterError(
@@ -170,12 +173,14 @@ class Interpreter:
             return self._create_obj(r_cls, None)
         if r_cls == "String" and selector == "read":
             import sys
+
             line = sys.stdin.readline()
             if not line:
                 return self._create_obj("String", "")
             return self._create_obj("String", line.rstrip("\n"))
-        raise InterpreterError(ErrorCode.SEM_UNDEF,
-                               f"Class {r_cls} does not understand {selector}")
+        raise InterpreterError(
+            ErrorCode.SEM_UNDEF, f"Class {r_cls} does not understand {selector}"
+        )
 
     def _handle_universal_methods(self, receiver, r_cls, selector, args):
         """
@@ -212,7 +217,7 @@ class Interpreter:
             "concatenateWith:": self._string_concatenate,
             "startsWith:endsBefore:": self._string_slice,
             "asString": lambda r, a: r,
-            "asInteger": self._string_as_int
+            "asInteger": self._string_as_int,
         }
 
         if selector in handlers:
@@ -237,9 +242,9 @@ class Interpreter:
         """Concatenates two strings if types match."""
         arg_cls = args[0].get("class")
         if arg_cls == "String" or self._is_subclass(arg_cls, "String"):
-            return self._create_obj("String",
-                                    str(receiver.get("val", "")) +
-                                    str(args[0].get("val", "")))
+            return self._create_obj(
+                "String", str(receiver.get("val", "")) + str(args[0].get("val", ""))
+            )
         return self.nil_obj
 
     def _string_slice(self, receiver, args):
@@ -251,7 +256,7 @@ class Interpreter:
                 return self.nil_obj
             if (end_idx - start_idx) <= 0:
                 return self._create_obj("String", "")
-            return self._create_obj("String", s_val[start_idx - 1: end_idx - 1])
+            return self._create_obj("String", s_val[start_idx - 1 : end_idx - 1])
         except (ValueError, TypeError):
             return self.nil_obj
 
@@ -296,8 +301,9 @@ class Interpreter:
         """Handles basic arithmetic and comparison for integers."""
         arg = args[0]
         if not (arg.get("class") == "Integer" or self._is_subclass(arg.get("class"), "Integer")):
-            raise InterpreterError(ErrorCode.INT_OTHER,
-                                   f"Operand for {selector} must be an Integer")
+            raise InterpreterError(
+                ErrorCode.INT_OTHER, f"Operand for {selector} must be an Integer"
+            )
 
         v1, v2 = receiver.get("val", 0), arg.get("val", 0)
 
@@ -336,8 +342,9 @@ class Interpreter:
                 return self.nil_obj
             if len(args) != len(data["node"].parameters or []):
                 raise InterpreterError(ErrorCode.SEM_ARITY, "Wrong number of arguments for block")
-            return self.execute_block(data["node"], args, data["captured_env"],
-                                      defining_class=data.get("defining_class"))
+            return self.execute_block(
+                data["node"], args, data["captured_env"], defining_class=data.get("defining_class")
+            )
         if selector == "whileTrue:":
             body, last_res = args[0], self.nil_obj
             while self.call_method(receiver, "value", []) is self.true_obj:
@@ -353,19 +360,17 @@ class Interpreter:
             if selector == "not":
                 return self.false_obj if r_cls == "True" else self.true_obj
             if selector == "and:":
-                return self.false_obj if r_cls == "False" else self.call_method(args[0],
-                                                                                "value", [])
+                return (
+                    self.false_obj if r_cls == "False" else self.call_method(args[0], "value", [])
+                )
             if selector == "ifTrue:":
                 return self.call_method(args[0], "value", []) if r_cls == "True" else self.nil_obj
             if selector == "ifFalse:":
-                return self.call_method(args[0], "value",
-                                                               []) \
-                                        if r_cls == "False" else self.nil_obj
+                return self.call_method(args[0], "value", []) if r_cls == "False" else self.nil_obj
             if selector == "or:":
                 return self.true_obj if r_cls == "True" else self.call_method(args[0], "value", [])
             if selector == "ifTrue:ifFalse:":
-                return self.call_method(args[0] if r_cls == "True" else args[1], "value",
-                                                                      [])
+                return self.call_method(args[0] if r_cls == "True" else args[1], "value", [])
             if selector == "asString":
                 return self._create_obj("String", r_cls.lower())
         if r_cls == "Nil" and selector == "asString":
@@ -406,8 +411,9 @@ class Interpreter:
             attr_name = selector[:-1]
             collision, _ = self._find_method(start_lookup, attr_name)
             if collision:
-                raise InterpreterError(ErrorCode.INT_INST_ATTR,
-                                       f"Error 54: Collision with method {attr_name}")
+                raise InterpreterError(
+                    ErrorCode.INT_INST_ATTR, f"Error 54: Collision with method {attr_name}"
+                )
             receiver.setdefault("attrs", {})[attr_name] = args[0]
             return receiver
         if selector in receiver.get("attrs", {}):

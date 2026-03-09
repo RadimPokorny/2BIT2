@@ -1,72 +1,67 @@
 # Global argument for Python version
 ARG PYTHON_VERSION=3.14-slim
 
-# --- STAGE 1: check (Static analysis & Linting) ---
+# --- STAGE 1: check ---
+# Static analysis
 FROM python:${PYTHON_VERSION} AS check
 WORKDIR /src
 
-# Install system dependencies required for building lxml and other C-extensions
+# Python dependency install
 RUN apt-get update && apt-get install -y \
-    gcc \
-    libxml2-dev \
-    libxslt-dev \
-    zlib1g-dev \
+    gcc libxml2-dev libxslt-dev zlib1g-dev \
+    php-cli php-xml php-mbstring unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy dependency files first to leverage Docker layer caching
+# Installing the composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Install the Python tools
 COPY requirements.txt ./
-COPY int/requirements-dev.txt ./
-# Copy pyproject.toml (assuming it's in the root or int/ directory)
-COPY int/pyproject.toml ./
+RUN pip install --no-cache-dir -r requirements.txt ruff mypy
 
-# Install all dependencies including dev tools (ruff, mypy)
-RUN pip install --no-cache-dir -r requirements.txt -r requirements-dev.txt
-
-# IMPORTANT: Copy the source code BEFORE running chmod
-COPY . .
-
-# Fix permissions:
-# 1. Remove executable bit from ALL files to satisfy Ruff EXE002
-# 2. Restore execution right ONLY for the entry point script
-RUN find . -type f -exec chmod -x {} + && \
-    chmod +x int/src/solint.py
-
-# Default command is bash to allow manual tool execution
+# Using terminal with bash
 ENTRYPOINT ["/bin/bash"]
 
-
-# --- STAGE 2: build (Preparation of source) ---
+# --- STAGE 2: build ---
+# Copying our interpreter
 FROM python:${PYTHON_VERSION} AS build
 WORKDIR /app
-# Copy project files for the final image
-COPY . .
+COPY int/ ./int/
 
+# --- STAGE 3: build-test ---
+# Installing the PHP dependencies and preparing the tester environment
+FROM composer:latest AS build-test
+WORKDIR /app/tester
+COPY tester/composer.json tester/composer.lock* ./
+RUN composer install --no-interaction --optimize-autoloader --no-dev
+COPY tester/ .
 
-# --- STAGE 3: runtime (The actual Interpreter) ---
+# --- STAGE 4: runtime ---
+# Image for the interpreter
 FROM python:${PYTHON_VERSION} AS runtime
 WORKDIR /app
 
-# Install only runtime shared libraries (no compilers needed here)
+# Installing the necessery libraries for the Python interpreter
 RUN apt-get update && apt-get install -y \
-    libxml2 \
-    libxslt1.1 \
-    zlib1g \
+    libxml2 libxslt1.1 zlib1g \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy installed python packages from the check stage
-COPY --from=check /usr/local/lib/python3.14/site-packages /usr/local/lib/python3.14/site-packages
-COPY --from=check /usr/local/bin /usr/local/bin
-
-# Copy the application source from build stage
 COPY --from=build /app/int ./int
+# Check stages packages for the runtime
+COPY --from=check /usr/local/lib/python3.14/site-packages /usr/local/lib/python3.14/site-packages
 
-# Set the interpreter entry point
 ENTRYPOINT ["python3", "int/src/solint.py"]
 
-
-# --- STAGE 4: test (Running automated tests) ---
+# --- STAGE 5: test ---
+# Default, but adds the PHP
 FROM runtime AS test
-WORKDIR /app
-# Copy test suite into the runtime-based image
-COPY --from=build /app/tester ./tester
-ENTRYPOINT ["python3", "tester/tester.py"]
+
+# Install the PHP interpreter
+RUN apt-get update && apt-get install -y \
+    php-cli php-xml php-mbstring \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copying the tester with a installed vendor build-test
+COPY --from=build-test /app/tester ./tester
+
+ENTRYPOINT ["php", "tester/src/tester.php"]

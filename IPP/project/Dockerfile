@@ -19,6 +19,10 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt ruff mypy
 
+# Copying the source code for the static analysis
+COPY . .  
+
+
 # Using terminal with bash
 ENTRYPOINT ["/bin/bash"]
 

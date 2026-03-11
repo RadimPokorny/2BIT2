@@ -1,0 +1,10 @@
+/Users/radim/Downloads/lab1/build/CMakeFiles/izg_lab_01.dir
+/Users/radim/Downloads/lab1/build/CMakeFiles/edit_cache.dir
+/Users/radim/Downloads/lab1/build/CMakeFiles/rebuild_cache.dir
+/Users/radim/Downloads/lab1/build/SDL/CMakeFiles/sdl_headers_copy.dir
+/Users/radim/Downloads/lab1/build/SDL/CMakeFiles/SDL2main.dir
+/Users/radim/Downloads/lab1/build/SDL/CMakeFiles/SDL2-static.dir
+/Users/radim/Downloads/lab1/build/SDL/CMakeFiles/SDL2_test.dir
+/Users/radim/Downloads/lab1/build/SDL/CMakeFiles/uninstall.dir
+/Users/radim/Downloads/lab1/build/SDL/CMakeFiles/edit_cache.dir
+/Users/radim/Downloads/lab1/build/SDL/CMakeFiles/rebuild_cache.dir

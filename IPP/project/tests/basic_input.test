@@ -1,0 +1,13 @@
+*** Testuje cteni ze STDIN a vypis
++++ BASIC
+!C! 0
+!I! 0
+>>> 5
+
+class Main : Object {
+    run [ |
+        varStr := (String read).             "Nacte radek ze .in jako String"
+        varInt := (varStr asInteger).        "Prevede String na Integer"
+        _ := (varInt asString) print.      "Prevede zpet na String a vytiskne na STDOUT"
+    ]
+}

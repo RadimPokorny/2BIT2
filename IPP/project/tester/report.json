@@ -1,0 +1,91 @@
+{
+    "discovered_test_cases": [
+        {
+            "name": "arithmetic",
+            "test_source_path": "\/src\/tests\/arithmetic.test",
+            "stdin_file": null,
+            "expected_stdout_file": null,
+            "test_type": 2,
+            "description": "Test zakladniho vypisu a aritmetiky",
+            "category": "BASIC",
+            "points": 2,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                0
+            ]
+        },
+        {
+            "name": "basic",
+            "test_source_path": "\/src\/tests\/basic.test",
+            "stdin_file": null,
+            "expected_stdout_file": null,
+            "test_type": 2,
+            "description": "Test zakladniho vypisu",
+            "category": "BASIC",
+            "points": 2,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                0
+            ]
+        },
+        {
+            "name": "basic_input",
+            "test_source_path": "\/src\/tests\/basic_input.test",
+            "stdin_file": "\/src\/tests\/basic_input.in",
+            "expected_stdout_file": "\/src\/tests\/basic_input.out",
+            "test_type": 2,
+            "description": "Testuje cteni ze STDIN a vypis",
+            "category": "BASIC",
+            "points": 5,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                0
+            ]
+        }
+    ],
+    "unexecuted": {},
+    "results": {
+        "BASIC": {
+            "total_points": 9,
+            "passed_points": 9,
+            "test_results": {
+                "arithmetic": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 0,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\">\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"x\"\/>\n          <expr>\n            <literal class=\"Integer\" value=\"10\"\/>\n          <\/expr>\n        <\/assign>\n        <assign order=\"2\">\n          <var name=\"y\"\/>\n          <expr>\n            <literal class=\"Integer\" value=\"20\"\/>\n          <\/expr>\n        <\/assign>\n        <assign order=\"3\">\n          <var name=\"z\"\/>\n          <expr>\n            <send selector=\"plus:\">\n              <expr>\n                <var name=\"x\"\/>\n              <\/expr>\n              <arg order=\"1\">\n                <expr>\n                  <var name=\"y\"\/>\n                <\/expr>\n              <\/arg>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"4\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <send selector=\"asString\">\n                  <expr>\n                    <var name=\"z\"\/>\n                  <\/expr>\n                <\/send>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "30",
+                    "interpreter_stderr": "",
+                    "diff_output": null
+                },
+                "basic": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 0,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\" description=\"Zm\u011bn\u011bno na 'name', aby nebyla kolize s metodou 'jmeno'\">\n  <class name=\"Model\" parent=\"Object\">\n    <method selector=\"init\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"name:\">\n              <expr>\n                <var name=\"self\"\/>\n              <\/expr>\n              <arg order=\"1\">\n                <expr>\n                  <literal class=\"String\" value=\"Puvodni\"\/>\n                <\/expr>\n              <\/arg>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"2\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"hodnota:\">\n              <expr>\n                <var name=\"self\"\/>\n              <\/expr>\n              <arg order=\"1\">\n                <expr>\n                  <literal class=\"Integer\" value=\"100\"\/>\n                <\/expr>\n              <\/arg>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n    <method selector=\"jmeno\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"_\"\/>\n          <expr>\n            <literal class=\"String\" value=\"Metoda jmeno\"\/>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"--- TEST START ---\\n\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"2\">\n          <var name=\"m1\"\/>\n          <expr>\n            <send selector=\"new\">\n              <expr>\n                <literal class=\"class\" value=\"Model\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"3\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"init\">\n              <expr>\n                <var name=\"m1\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"4\">\n          <var name=\"m2\"\/>\n          <expr>\n            <send selector=\"from:\">\n              <expr>\n                <literal class=\"class\" value=\"Model\"\/>\n              <\/expr>\n              <arg order=\"1\">\n                <expr>\n                  <var name=\"m1\"\/>\n                <\/expr>\n              <\/arg>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"5\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"Metoda m2 jmeno: \"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"6\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <send selector=\"jmeno\">\n                  <expr>\n                    <var name=\"m2\"\/>\n                  <\/expr>\n                <\/send>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"7\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"\\n\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"8\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"Atribut m2 name: \"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"9\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <send selector=\"name\">\n                  <expr>\n                    <var name=\"m2\"\/>\n                  <\/expr>\n                <\/send>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"10\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"\\n\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"11\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"Atribut m2 hodnota: \"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"12\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <send selector=\"asString\">\n                  <expr>\n                    <send selector=\"hodnota\">\n                      <expr>\n                        <var name=\"m2\"\/>\n                      <\/expr>\n                    <\/send>\n                  <\/expr>\n                <\/send>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"13\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"\\n\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"14\">\n          <var name=\"s\"\/>\n          <expr>\n            <literal class=\"String\" value=\"uwu\"\/>\n          <\/expr>\n        <\/assign>\n        <assign order=\"15\">\n          <var name=\"sub\"\/>\n          <expr>\n            <send selector=\"startsWith:endsBefore:\">\n              <expr>\n                <var name=\"s\"\/>\n              <\/expr>\n              <arg order=\"1\">\n                <expr>\n                  <literal class=\"Integer\" value=\"1\"\/>\n                <\/expr>\n              <\/arg>\n              <arg order=\"2\">\n                <expr>\n                  <literal class=\"Integer\" value=\"4\"\/>\n                <\/expr>\n              <\/arg>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"16\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"Substring (VUT): \"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"17\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <var name=\"sub\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"18\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"\\n\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"19\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"--- TEST END ---\\n\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "--- TEST START ---\nMetoda m2 jmeno: Metoda jmeno\nAtribut m2 name: Puvodni\nAtribut m2 hodnota: 100\nSubstring (VUT): uwu\n--- TEST END ---\n",
+                    "interpreter_stderr": "",
+                    "diff_output": null
+                },
+                "basic_input": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 0,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\" description=\"Nacte radek ze .in jako String\">\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"varStr\"\/>\n          <expr>\n            <send selector=\"read\">\n              <expr>\n                <literal class=\"class\" value=\"String\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"2\">\n          <var name=\"varInt\"\/>\n          <expr>\n            <send selector=\"asInteger\">\n              <expr>\n                <var name=\"varStr\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"3\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <send selector=\"asString\">\n                  <expr>\n                    <var name=\"varInt\"\/>\n                  <\/expr>\n                <\/send>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "43",
+                    "interpreter_stderr": "",
+                    "diff_output": null
+                }
+            }
+        }
+    }
+}

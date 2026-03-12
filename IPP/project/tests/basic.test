@@ -1,3 +1,9 @@
+*** Test zakladniho vypisu
++++ BASIC
+!C! 0
+!I! 0
+>>> 2
+
 class Model : Object {
     init [|
         "Změněno na 'name', aby nebyla kolize s metodou 'jmeno'"

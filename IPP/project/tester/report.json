@@ -47,6 +47,262 @@
             "expected_interpreter_exit_codes": [
                 0
             ]
+        },
+        {
+            "name": "basic_math",
+            "test_source_path": "\/src\/tests\/basic_math.test",
+            "stdin_file": "\/src\/tests\/basic_math.in",
+            "expected_stdout_file": "\/src\/tests\/basic_math.out",
+            "test_type": 2,
+            "description": "Matematicke operace a porovnavani",
+            "category": "INTEGERS",
+            "points": 1,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                0
+            ]
+        },
+        {
+            "name": "blocks_iter",
+            "test_source_path": "\/src\/tests\/blocks_iter.test",
+            "stdin_file": "\/src\/tests\/blocks_iter.in",
+            "expected_stdout_file": "\/src\/tests\/blocks_iter.out",
+            "test_type": 2,
+            "description": "Iterace a uzavery (closures)",
+            "category": "BLOCKS",
+            "points": 1,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                0
+            ]
+        },
+        {
+            "name": "conversion",
+            "test_source_path": "\/src\/tests\/conversion.test",
+            "stdin_file": "\/src\/tests\/conversion.in",
+            "expected_stdout_file": "\/src\/tests\/conversion.out",
+            "test_type": 2,
+            "description": "Nacteni retezce a prevod na cislo",
+            "category": "CONVERSION",
+            "points": 1,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                0
+            ]
+        },
+        {
+            "name": "inheritance_1",
+            "test_source_path": "\/src\/tests\/inheritance_1.test",
+            "stdin_file": null,
+            "expected_stdout_file": null,
+            "test_type": 2,
+            "description": "Dedicnost a super volani",
+            "category": "INHERITANCE",
+            "points": 5,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                0
+            ]
+        },
+        {
+            "name": "poly1",
+            "test_source_path": "\/src\/tests\/poly1.test",
+            "stdin_file": "\/src\/tests\/poly1.in",
+            "expected_stdout_file": "\/src\/tests\/poly1.out",
+            "test_type": 2,
+            "description": "Test polymorphismu a kl\u00ed\u010dov\u00e9ho slova super",
+            "category": "POLYMORPHISM",
+            "points": 3,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                0
+            ]
+        },
+        {
+            "name": "runtime_err_1",
+            "test_source_path": "\/src\/tests\/runtime_err_1.test",
+            "stdin_file": null,
+            "expected_stdout_file": null,
+            "test_type": 2,
+            "description": "Deleni nulou (Chyba 53)",
+            "category": "ERRORS_RUNTIME",
+            "points": 2,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                53
+            ]
+        },
+        {
+            "name": "runtime_err_2",
+            "test_source_path": "\/src\/tests\/runtime_err_2.test",
+            "stdin_file": null,
+            "expected_stdout_file": null,
+            "test_type": 2,
+            "description": "Objekt nerozumi zprave (Chyba 51)",
+            "category": "ERRORS_RUNTIME",
+            "points": 2,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                51
+            ]
+        },
+        {
+            "name": "runtime_err_3",
+            "test_source_path": "\/src\/tests\/runtime_err_3.test",
+            "stdin_file": null,
+            "expected_stdout_file": null,
+            "test_type": 2,
+            "description": "Kolize atributu s existujici metodou (Chyba 54)",
+            "category": "ERRORS_RUNTIME",
+            "points": 2,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                54
+            ]
+        },
+        {
+            "name": "sem_err_1",
+            "test_source_path": "\/src\/tests\/sem_err_1.test",
+            "stdin_file": null,
+            "expected_stdout_file": null,
+            "test_type": 2,
+            "description": "Pokus o zapis do parametru (Chyba 34)",
+            "category": "ERRORS_SEMANTIC",
+            "points": 2,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                34
+            ]
+        },
+        {
+            "name": "sem_err_2",
+            "test_source_path": "\/src\/tests\/sem_err_2.test",
+            "stdin_file": null,
+            "expected_stdout_file": null,
+            "test_type": 2,
+            "description": "Cteni neinicializovane promenne (Chyba 32)",
+            "category": "ERRORS_SEMANTIC",
+            "points": 2,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                32
+            ]
+        },
+        {
+            "name": "simple_blocks_1",
+            "test_source_path": "\/src\/tests\/simple_blocks_1.test",
+            "stdin_file": null,
+            "expected_stdout_file": null,
+            "test_type": 2,
+            "description": "Iterace a uzaver bloku",
+            "category": "BLOCKS",
+            "points": 5,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                0
+            ]
+        },
+        {
+            "name": "simple_control_flow",
+            "test_source_path": "\/src\/tests\/simple_control_flow.test",
+            "stdin_file": null,
+            "expected_stdout_file": null,
+            "test_type": 2,
+            "description": "Test podminek pres True\/False objekty",
+            "category": "CONTROL_FLOW",
+            "points": 5,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                0
+            ]
+        },
+        {
+            "name": "simple_instances_1",
+            "test_source_path": "\/src\/tests\/simple_instances_1.test",
+            "stdin_file": null,
+            "expected_stdout_file": null,
+            "test_type": 2,
+            "description": "Dynamicke instancni atributy a nil",
+            "category": "OBJECTS",
+            "points": 4,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                0
+            ]
+        },
+        {
+            "name": "simple_math_expr",
+            "test_source_path": "\/src\/tests\/simple_math_expr.test",
+            "stdin_file": null,
+            "expected_stdout_file": null,
+            "test_type": 2,
+            "description": "Komplexni aritmetika a priority (vno\u0159ov\u00e1n\u00ed)",
+            "category": "ARITHMETIC",
+            "points": 3,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                0
+            ]
+        },
+        {
+            "name": "string_advanced_1",
+            "test_source_path": "\/src\/tests\/string_advanced_1.test",
+            "stdin_file": "\/src\/tests\/string_advanced_1.in",
+            "expected_stdout_file": "\/src\/tests\/string_advanced_1.out",
+            "test_type": 2,
+            "description": "Pokrocila prace s retezci",
+            "category": "STRINGS",
+            "points": 1,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                0
+            ]
+        },
+        {
+            "name": "string_oper_1",
+            "test_source_path": "\/src\/tests\/string_oper_1.test",
+            "stdin_file": null,
+            "expected_stdout_file": null,
+            "test_type": 2,
+            "description": "Prace s podretezci a delkou",
+            "category": "STRINGS",
+            "points": 3,
+            "expected_parser_exit_codes": [
+                0
+            ],
+            "expected_interpreter_exit_codes": [
+                0
+            ]
         }
     ],
     "unexecuted": {},

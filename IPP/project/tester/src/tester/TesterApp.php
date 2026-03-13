@@ -118,6 +118,7 @@ class TesterApp
             throw new RuntimeException('Failed to serialize report to JSON.');
         }
 
+        // Write the output into the file
         $outputFile = $this->arguments->output;
         if ($outputFile !== null) {
             $written = file_put_contents($outputFile, $resultJson);
@@ -130,17 +131,15 @@ class TesterApp
 
             return;
         }
-        else {
-            fwrite(STDOUT, $resultJson . PHP_EOL); // Do terminálu
-        }
 
+        // Show in terminal if there is no directory argument
         fwrite(STDOUT, $resultJson . PHP_EOL);
     }
 
     /**
      * Parses a single .test file and discovers associated files.
      * * @param string $filePath Path to the .test file.
-     * @return TestCaseDefinition The parsed test case definition.
+     * @return array The parsed test case definition.
      * @throws RuntimeException If the file cannot be read.
      */
     private function parseTestFile(string $filePath): array
@@ -150,8 +149,7 @@ class TesterApp
             throw new RuntimeException("Failed to read file: $filePath");
         }
 
-        // Rozdělíme soubor na HLAVIČKU a KÓD podle prvního výskytu "class " nebo "["
-        // Protože metadata končí tam, kde začíná SOL26 kód.
+        // Splitting up the code and the header
         $lines = explode("\n", $content);
         $name = pathinfo($filePath, PATHINFO_FILENAME);
         $dir = dirname($filePath);
@@ -164,11 +162,12 @@ class TesterApp
         $sourceCodeLines = [];
         $headerFinished = false;
 
+        // Process the non-code entities in the test file header
         foreach ($lines as $line) {
-            $lineR = rtrim($line);
+            $lineR = trim($line, "\r\n");
 
             if (!$headerFinished) {
-                // Detekce metadat
+                // Metadata detection
                 if (str_starts_with($lineR, '***')) {
                     $description = trim(substr($lineR, 3));
                     continue;
@@ -186,24 +185,23 @@ class TesterApp
                     continue;
                 }
 
-                // KLÍČOVÁ ZMĚNA: Pokud řádek není prázdný a nezačíná metadaty,
-                // je to už kód a HLAVIČKA KONČÍ.
                 if (trim($lineR) !== "") {
                     $headerFinished = true;
-                    // Tento řádek už patří do kódu, takže ho nesmíme zahodit!
                 } else {
-                    continue; // Přeskoč prázdné řádky mezi metadaty a kódem
+                    // Skip the empty rows
+                    continue;
                 }
             }
-
+            // Get the SOL26 code
             $sourceCodeLines[] = $line;
         }
 
-
+        // Normalize the input code
         $sourceCode = implode("\n", $sourceCodeLines);
         $type = (empty($expectedC) && !empty($expectedI)) ? TestCaseType::EXECUTE_ONLY : TestCaseType::COMBINED;
         if (!empty($expectedC) && empty($expectedI)) $type = TestCaseType::PARSE_ONLY;
 
+        // Check the existence (out and in file are optional)
         $definition = new TestCaseDefinition(
             $name, $filePath, $type, $category,
             file_exists("$dir/$name.in") ? "$dir/$name.in" : null,
@@ -230,6 +228,7 @@ class TesterApp
             ? new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory, $flags))
             : new \DirectoryIterator($directory);
 
+        // Find all the files
         foreach ($iterator as $file) {
             if ($file->isFile() && $file->getExtension() === 'test') {
                 $paths[] = $file->getRealPath();
@@ -245,6 +244,7 @@ class TesterApp
      */
     public function run(): int
     {
+        // Return the specified code if there is no directory to be tested
         if (!is_dir($this->arguments->testsDir)) {
             return 1;
         }
@@ -257,6 +257,7 @@ class TesterApp
         $catScores = [];
         $catTotals = [];
 
+        // Process all the tests
         foreach ($paths as $path) {
             $testName = pathinfo($path, PATHINFO_FILENAME);
             try {
@@ -277,13 +278,13 @@ class TesterApp
                     $catTotals[$cat] = 0;
                 }
 
-                // Body do celkového součtu kategorie přičteme hned, jak test "přijmeme" k exekuci
+                // Add the total points to the category
                 $catTotals[$cat] += $test->points;
 
                 $testCaseReport = $this->executeTestCase($test, $sourceCode);
                 $catResults[$cat][$test->name] = $testCaseReport;
 
-                // Body do passed přičteme jen při úspěchu
+                // Add points to the succesful category
                 if ($testCaseReport->result === TestResult::PASSED) {
                     $catScores[$cat] += $test->points;
                 }
@@ -294,14 +295,11 @@ class TesterApp
         }
 
         $finalCategoryReports = [];
-        foreach ($catResults as $catName => $tests) {
-            // Prohodil jsem proměnné, aby total byl první
-            $finalCategoryReports[$catName] = new CategoryReport(
-                $catTotals[$catName], // 1. Total (v JSONu to chceš jako první)
-                $catScores[$catName], // 2. Passed
-                $tests
-            );
-        }
+        foreach ($catResults as $catName => $tests) $finalCategoryReports[$catName] = new CategoryReport(
+            $catTotals[$catName], // Total
+            $catScores[$catName], // Passed
+            $tests
+        );
 
         $report = new TestReport($discoveredTestCases, $unexecuted, $finalCategoryReports);
         $this->writeResult($report);
@@ -357,13 +355,13 @@ class TesterApp
         $diff = null;
         $tempFiles = [];
 
-        // 1. Příprava čistého zdrojového kódu
+        // Preparing the source code file
         $srcTmp = tempnam(sys_get_temp_dir(), 'ipp_src_');
         file_put_contents($srcTmp, $sourceCode);
         $tempFiles[] = $srcTmp;
         $fileToRun = $srcTmp;
 
-        // 2. Fáze překladu (SOL2XML / Parser)
+        // Parsing SOL26 into the XML
         if ($test->testType !== TestCaseType::EXECUTE_ONLY) {
             $res = $this->runCommand(['python3', '/src/sol_to_xml.py', $srcTmp]);
             $parserExitCode = $res['code'];
@@ -378,24 +376,19 @@ class TesterApp
             }
         }
 
-        // 3. Fáze interpretace
-        // Spustí se pokud: je to EXECUTE_ONLY NEBO (je to COMBINED a parser uspěl)
+        // Interpretation
+        // If parser has been executed correctly we can execute (if it is allowed)
         if ($test->testType === TestCaseType::EXECUTE_ONLY ||
             ($test->testType === TestCaseType::COMBINED && $parserExitCode === 0)) {
 
-            // Upravíme příkaz tak, aby odpovídal tvé struktuře:
-            // 1. Nastavíme PYTHONPATH (pro jistotu přímo v commandu)
-            // 2. Spustíme solint.py místo interpret.py
-
+            // Setting up the PYTHON path
             $cmd = [
                 'python3',
-                '/src/int/src/solint.py', // Upravená cesta k tvému souboru
+                '/src/int/src/solint.py',
                 '--source',
                 $fileToRun
             ];
 
-            // Aby fungovaly importy uvnitř tvého interpretu, musíme nastavit environment
-            // To uděláme tak, že do proc_open pošleme upravené env pole
             $env = array_merge($_ENV, ['PYTHONPATH' => '/src/int/src']);
 
             $res = $this->runCommand($cmd, $test->stdinFile, $env);
@@ -404,27 +397,25 @@ class TesterApp
             $interpreterStderr = $res['stderr'];
         }
 
-        // 4. Validace výsledků
+        // Validation of the results
         $finalResult = TestResult::PASSED;
         $isCodeOk = false;
 
         if ($test->testType === TestCaseType::PARSE_ONLY) {
-            // Validace pouze parseru
+            // Parser validation
             $expectedCodes = $test->expectedParserExitCodes ?? [0];
             $isCodeOk = in_array($parserExitCode, $expectedCodes);
             if (!$isCodeOk) {
                 $finalResult = TestResult::UNEXPECTED_PARSER_EXIT_CODE;
             }
         } else {
-            // Validace pro COMBINED nebo EXECUTE_ONLY
+            // Execution only or combined validation
             if ($test->testType === TestCaseType::COMBINED && $parserExitCode !== 0) {
-                // Pokud u COMBINED selhal parser, je to chyba parseru (i kdyby interpret čekal nenulu)
                 $isCodeOk = false;
                 $finalResult = TestResult::UNEXPECTED_PARSER_EXIT_CODE;
             } else {
-                // Validace interpretu
+                // Interpreter validation
                 $expectedCodes = $test->expectedInterpreterExitCodes ?? [0];
-                // Pozor: null (interpret neběžel) nikdy neprojde in_array([0])
                 $isCodeOk = ($interpreterExitCode !== null) && in_array($interpreterExitCode, $expectedCodes);
                 if (!$isCodeOk) {
                     $finalResult = TestResult::UNEXPECTED_INTERPRETER_EXIT_CODE;
@@ -432,24 +423,38 @@ class TesterApp
             }
         }
 
-        // 5. Kontrola výstupu (diff) - pouze pokud exit kódy sedí a jsou 0
+        // Control of the DIFF output
         if ($isCodeOk && $finalResult === TestResult::PASSED) {
             $lastExitCode = ($test->testType === TestCaseType::PARSE_ONLY) ? $parserExitCode : $interpreterExitCode;
 
             if ($lastExitCode === 0 && $test->expectedStdoutFile) {
-                $tmpOut = tempnam(sys_get_temp_dir(), 'ipp_out_');
-                file_put_contents($tmpOut, $interpreterStdout ?? "");
+                // Removing the unnecessary empty space character
+                $actualClean = trim(str_replace("\r", "", $interpreterStdout ?? ""));
 
-                $diffRes = $this->runCommand(['diff', $tmpOut, $test->expectedStdoutFile]);
+                // If there is no file we use the empty string
+                $expectedRaw = file_exists($test->expectedStdoutFile) ? file_get_contents($test->expectedStdoutFile) : "";
+                $expectedClean = trim(str_replace("\r", "", $expectedRaw ?: ""));
+
+                // Temporary files for the DIFF output
+                $tmpOut = tempnam(sys_get_temp_dir(), 'ipp_out_');
+                $tmpExp = tempnam(sys_get_temp_dir(), 'ipp_exp_');
+
+                file_put_contents($tmpOut, $actualClean);
+                file_put_contents($tmpExp, $expectedClean);
+
+                // Executing the DIFF
+                $diffRes = $this->runCommand(['diff', $tmpOut, $tmpExp]);
                 if ($diffRes['code'] !== 0) {
                     $finalResult = TestResult::INTERPRETER_RESULT_DIFFERS;
                     $diff = $diffRes['stdout'];
                 }
+
                 $tempFiles[] = $tmpOut;
+                $tempFiles[] = $tmpExp;
             }
         }
 
-        // Úklid dočasných souborů
+        // Cleaning up the temporary files
         foreach ($tempFiles as $f) {
             if (file_exists($f)) @unlink($f);
         }
@@ -476,12 +481,12 @@ class TesterApp
         $args = $this->arguments;
         $useRegex = $args->regexFilters;
 
-        // Pomocná funkce pro kontrolu shody (string vs regex)
+        // String and regex control
         $matches = function (string $subject, ?array $filters) use ($useRegex): bool {
             if ($filters === null) return false;
             foreach ($filters as $f) {
                 if ($useRegex) {
-                    // Použijeme @ jako oddělovač, aby se nekouslo s lomítky v cestách
+                    // @ is only the splitter
                     if (preg_match('@' . $f . '@', $subject)) return true;
                 } else {
                     if ($subject === $f) return true;
@@ -490,9 +495,10 @@ class TesterApp
             return false;
         };
 
-        // 1. Logika pro INCLUDE
+        // Include argument logic
         $hasInclude = ($args->include !== null || $args->includeTest !== null || $args->includeCategory !== null);
-        $isIncluded = !$hasInclude; // Pokud není filtr, bereme vše
+        // If there is no filter let's take it all
+        $isIncluded = !$hasInclude;
 
         if ($hasInclude) {
             if ($matches($test->name, $args->include) ||
@@ -503,7 +509,7 @@ class TesterApp
             }
         }
 
-        // 2. Logika pro EXCLUDE (přebíjí vše)
+        // Exclude argument logic
         if ($matches($test->name, $args->exclude) ||
             $matches($test->name, $args->excludeTest) ||
             $matches($test->category, $args->exclude) ||

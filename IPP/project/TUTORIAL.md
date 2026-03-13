@@ -26,7 +26,7 @@
 # Run the tester
 
 ## 1. Move to the right directory
-`cd src/tester`
+`cd /src/tester`
 
 ## 2. Run tester and save the report 
 `php src/tester.php ../tests --output report.json`

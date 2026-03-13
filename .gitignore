@@ -25,3 +25,7 @@ Thumbs.db
 # Projektové lokální XML (pokud je nechceš v gitu)
 *.xml
 !parser_output_schema.xsd  # Pokud chceš zachovat schéma, ale ignorovat generované výstupy
+**/*.test
+**/*.out
+**/*.in
+IPP/project/tester/*.json

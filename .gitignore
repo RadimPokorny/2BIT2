@@ -28,4 +28,12 @@ Thumbs.db
 **/*.test
 **/*.out
 **/*.in
+**/*.obj
+**/*.pdb
+**/*.tlog
+**/*.log
+**/*.db
+**/*.idb
+**/*.ilk
+**/*.vsidx
 IPP/project/tester/*.json

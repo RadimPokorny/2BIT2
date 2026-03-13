@@ -125,11 +125,11 @@ void drawTriangle(const Point& v1, const Point& v2, const Point& v3, const RGBA&
     // Nalezeni obalky (minX, maxX), (minY, maxY) trojuhleniku.
 
     //////// DOPLNIME SPOLECNE /////////
-    int minX = v1.x;
-    int minY = v1.y;
+    int minX = MAX(0, MIN(v1.x, MIN(v2.x, v3.x)));
+    int minY = MAX(0, MIN(v1.y, MIN(v2.y, v3.y)));
 
-    int maxX = v1.x;
-    int maxY = v1.y;
+    int maxX = MIN(width - 1, MAX(v1.x, MAX(v2.x, v3.x)));
+    int maxY = MIN(height - 1, MAX(v1.y, MAX(v2.y, v3.y)));
 
 
     // Oriznuti obalky (minX, maxX, minY, maxY) trojuhleniku podle rozmeru okna.
@@ -143,7 +143,9 @@ void drawTriangle(const Point& v1, const Point& v2, const Point& v3, const RGBA&
     // v prvnim vrcholu hrany a konec ve druhem vrcholu hrany.
 
     //////// DOPLNIME SPOLECNE /////////
-
+    int dx12 = v2.x - v1.x; int dy12 = v2.y - v1.y;
+    int dx23 = v3.x - v2.x; int dy23 = v3.y - v2.y;
+    int dx31 = v1.x - v3.x; int dy31 = v1.y - v3.y;
 
     // Barvy ve vrcholech.
     RGBA v1Color = COLOR_YELLOW;
@@ -155,10 +157,20 @@ void drawTriangle(const Point& v1, const Point& v2, const Point& v3, const RGBA&
 
     //////// DOPLNIME SPOLECNE /////////
 
+    int obsah = dy12 * dx31 - dx12 * dy31;
+    if (obsah == 0) return;
+
 
     // Vyplnovani: Cyklus pres vsechny body (x, y) v obdelniku (minX, minY), (maxX, maxY).
     // Pro aktualizaci hodnot hranove funkce v bode P (x +/- 1, y) nebo P (x, y +/- 1)
     // vyuzijte hodnoty hranove funkce E (x, y) z bodu P (x, y).
+
+    int E12_start, E23_start, E31_start;
+	int E12; int E23; int E31;
+
+    int E12_row = (minY - v1.y) * dx12 - (minX - v1.x) * dy12;
+    int E23_row = (minY - v2.y) * dx23 - (minX - v2.x) * dy23;
+    int E31_row = (minY - v3.y) * dx31 - (minX - v3.x) * dy31;
 
     for (int y = minY; y <= maxY; y++) {
 
@@ -167,16 +179,24 @@ void drawTriangle(const Point& v1, const Point& v2, const Point& v3, const RGBA&
 
         //////// DOPLNIME SPOLECNE /////////
 
+        int E12 = E12_row;
+        int E23 = E23_row;
+        int E31 = E31_row;
+
         for (int x = minX; x <= maxX; x++) {
             // Kontrola nalezitosti pixelu trojuhelniku pomoci hranovych funkci.
 
             //////// DOPLNIME SPOLECNE /////////
-            if (true) {
+            if (obsah > 0 ? (E12 >= 0 && E23 >= 0 && E31 >= 0) : (E12 <= 0 && E23 <= 0 && E31 <= 0)) {
                 // Vypocet obsahu (area12, area23, area31) dilcich casti hlavniho
                 // trojuhelniku pro vypocet barycentrickych souradnic. Vyuzijte
                 // vypocet pomoci vektoroveho soucinu.
 
                 //////// BODOVANY UKOL /////////
+
+                int obsah12 = E23;
+                int obsah23 = E31;
+                int obsah31 = E12;
 
                 // Vypocet obsahu (area12, area23, area31) pomoci hranovych funkci.
                 // Predchozi vypocet pomoci vektoroveho soucinu nemazte, pouze upravte
@@ -184,17 +204,21 @@ void drawTriangle(const Point& v1, const Point& v2, const Point& v3, const RGBA&
 
                 //////// BODOVANY UKOL /////////
 
+                float lambda1 = (float)obsah23 / obsah;
+                float lambda2 = (float)obsah31 / obsah;
+                float lambda3 = (float)obsah12 / obsah;
+
                 // Vypocet barycentrickych souradnic (lambda1, lambda2, lambda3).
 
                 //////// BODOVANY UKOL /////////
 
                 // Interpolace barev ve vrcholech. Vypoctene vahy aplikujte na kazdy kanal
-                // (R, G, B) zvlast.
+                // (R, G, B) zvlast
 
                 //////// BODOVANY UKOL /////////
-                float r = v1Color.red;
-                float g = v1Color.green;
-                float b = v1Color.blue;
+                float r = lambda1 * v1Color.red + lambda2 * v2Color.red + lambda3 * v3Color.red;
+                float g = lambda1 * v1Color.green + lambda2 * v2Color.green + lambda3 * v3Color.green;
+                float b = lambda1 * v1Color.blue + lambda2 * v2Color.blue + lambda3 * v3Color.blue;
 
 
                 // Konstrukce interpolovane barvy z vypoctenych hodnot.
@@ -207,7 +231,13 @@ void drawTriangle(const Point& v1, const Point& v2, const Point& v3, const RGBA&
             // Aktualizace hodnot hranovych funkci pri posunu na radku.
 
             //////// DOPLNIME SPOLECNE /////////
+            E12 -= dy12;
+            E23 -= dy23;
+            E31 -= dy31;
         }
+        E12_row += dx12;
+        E23_row += dx23;
+        E31_row += dx31;
     }
 
     // Prekresleni hranic trojuhelniku barvou edgeColor.

@@ -13,3 +13,17 @@ u31_r:- write('Zadej LIN: '),read(LIN),
 
 % Reseni:
 u31(LIN,VOUT):-
+	u31_max(LIN,MAX),
+	u31_index(LIN,MAX,1,VOUT),!.
+u31_max([H|T],MAX):-
+	u31_max(T,MAX1),
+	MAX is max(H,MAX1).
+u31_max([H],H).
+u31_index([H|_],MAX,INDEX,INDEX):-
+	H =:= MAX.
+u31_index([H|T],MAX,INDEX,INDEX_OUT):-
+	H =\= MAX,
+	INDEX1 is INDEX + 1,
+	u31_index(T,MAX,INDEX1,INDEX_OUT).
+
+

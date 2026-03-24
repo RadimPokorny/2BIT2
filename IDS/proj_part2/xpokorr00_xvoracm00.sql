@@ -124,7 +124,6 @@ CREATE TABLE vyskolen (
     CONSTRAINT fk_vyskolen_technik FOREIGN KEY (rodne_cislo) REFERENCES technik(rodne_cislo)
 );
 
--- 3. INSERTY (Oracle styl - každý zvlášť, opravené datumy)
 INSERT INTO model_letadla (vyrobce, nazev_modelu, cislo_modelu) VALUES ('Boeing', 'Max', 767);
 INSERT INTO model_letadla (vyrobce, nazev_modelu, cislo_modelu) VALUES ('Airbus', 'Ultra', 67);
 INSERT INTO model_letadla (vyrobce, nazev_modelu, cislo_modelu) VALUES ('General Dynamics', 'Falcon', 47);

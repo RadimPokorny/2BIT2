@@ -342,6 +342,232 @@
                     "diff_output": null
                 }
             }
+        },
+        "INTEGERS": {
+            "total_points": 1,
+            "passed_points": 1,
+            "test_results": {
+                "basic_math": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 0,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\" description=\"Vypocet: (10 * 3) + 5 = 35\">\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"a\"\/>\n          <expr>\n            <literal class=\"Integer\" value=\"10\"\/>\n          <\/expr>\n        <\/assign>\n        <assign order=\"2\">\n          <var name=\"b\"\/>\n          <expr>\n            <literal class=\"Integer\" value=\"3\"\/>\n          <\/expr>\n        <\/assign>\n        <assign order=\"3\">\n          <var name=\"res\"\/>\n          <expr>\n            <send selector=\"plus:\">\n              <expr>\n                <send selector=\"multiplyBy:\">\n                  <expr>\n                    <var name=\"a\"\/>\n                  <\/expr>\n                  <arg order=\"1\">\n                    <expr>\n                      <var name=\"b\"\/>\n                    <\/expr>\n                  <\/arg>\n                <\/send>\n              <\/expr>\n              <arg order=\"1\">\n                <expr>\n                  <literal class=\"Integer\" value=\"5\"\/>\n                <\/expr>\n              <\/arg>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"4\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <send selector=\"asString\">\n                  <expr>\n                    <var name=\"res\"\/>\n                  <\/expr>\n                <\/send>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"5\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"\\n\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"6\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <send selector=\"asString\">\n                  <expr>\n                    <send selector=\"divBy:\">\n                      <expr>\n                        <var name=\"a\"\/>\n                      <\/expr>\n                      <arg order=\"1\">\n                        <expr>\n                          <var name=\"b\"\/>\n                        <\/expr>\n                      <\/arg>\n                    <\/send>\n                  <\/expr>\n                <\/send>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"7\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"\\n\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"8\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"ifTrue:ifFalse:\">\n              <expr>\n                <send selector=\"greaterThan:\">\n                  <expr>\n                    <var name=\"a\"\/>\n                  <\/expr>\n                  <arg order=\"1\">\n                    <expr>\n                      <var name=\"b\"\/>\n                    <\/expr>\n                  <\/arg>\n                <\/send>\n              <\/expr>\n              <arg order=\"1\">\n                <expr>\n                  <block arity=\"0\">\n                    <assign order=\"1\">\n                      <var name=\"_\"\/>\n                      <expr>\n                        <send selector=\"print\">\n                          <expr>\n                            <literal class=\"String\" value=\"10 je vetsi\\n\"\/>\n                          <\/expr>\n                        <\/send>\n                      <\/expr>\n                    <\/assign>\n                  <\/block>\n                <\/expr>\n              <\/arg>\n              <arg order=\"2\">\n                <expr>\n                  <block arity=\"0\"\/>\n                <\/expr>\n              <\/arg>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "35\n3\n10 je vetsi\n",
+                    "interpreter_stderr": "",
+                    "diff_output": null
+                }
+            }
+        },
+        "BLOCKS": {
+            "total_points": 6,
+            "passed_points": 6,
+            "test_results": {
+                "blocks_iter": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 0,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\">\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"suma\"\/>\n          <expr>\n            <literal class=\"Integer\" value=\"0\"\/>\n          <\/expr>\n        <\/assign>\n        <assign order=\"2\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"timesRepeat:\">\n              <expr>\n                <literal class=\"Integer\" value=\"3\"\/>\n              <\/expr>\n              <arg order=\"1\">\n                <expr>\n                  <block arity=\"1\">\n                    <parameter order=\"1\" name=\"i\"\/>\n                    <assign order=\"1\">\n                      <var name=\"suma\"\/>\n                      <expr>\n                        <send selector=\"plus:\">\n                          <expr>\n                            <var name=\"suma\"\/>\n                          <\/expr>\n                          <arg order=\"1\">\n                            <expr>\n                              <var name=\"i\"\/>\n                            <\/expr>\n                          <\/arg>\n                        <\/send>\n                      <\/expr>\n                    <\/assign>\n                    <assign order=\"2\">\n                      <var name=\"_\"\/>\n                      <expr>\n                        <send selector=\"print\">\n                          <expr>\n                            <send selector=\"asString\">\n                              <expr>\n                                <var name=\"i\"\/>\n                              <\/expr>\n                            <\/send>\n                          <\/expr>\n                        <\/send>\n                      <\/expr>\n                    <\/assign>\n                  <\/block>\n                <\/expr>\n              <\/arg>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"3\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"\\nSuma: \"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"4\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <send selector=\"asString\">\n                  <expr>\n                    <var name=\"suma\"\/>\n                  <\/expr>\n                <\/send>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "123\nSuma: 6",
+                    "interpreter_stderr": "",
+                    "diff_output": null
+                },
+                "simple_blocks_1": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 0,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\" description=\"timesRepeat: preda bloku cislo iterace 1 az 3\">\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"suma\"\/>\n          <expr>\n            <literal class=\"Integer\" value=\"0\"\/>\n          <\/expr>\n        <\/assign>\n        <assign order=\"2\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"timesRepeat:\">\n              <expr>\n                <literal class=\"Integer\" value=\"3\"\/>\n              <\/expr>\n              <arg order=\"1\">\n                <expr>\n                  <block arity=\"1\">\n                    <parameter order=\"1\" name=\"i\"\/>\n                    <assign order=\"1\">\n                      <var name=\"suma\"\/>\n                      <expr>\n                        <send selector=\"plus:\">\n                          <expr>\n                            <var name=\"suma\"\/>\n                          <\/expr>\n                          <arg order=\"1\">\n                            <expr>\n                              <var name=\"i\"\/>\n                            <\/expr>\n                          <\/arg>\n                        <\/send>\n                      <\/expr>\n                    <\/assign>\n                  <\/block>\n                <\/expr>\n              <\/arg>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"3\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <send selector=\"asString\">\n                  <expr>\n                    <var name=\"suma\"\/>\n                  <\/expr>\n                <\/send>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "6",
+                    "interpreter_stderr": "",
+                    "diff_output": null
+                }
+            }
+        },
+        "CONVERSION": {
+            "total_points": 1,
+            "passed_points": 1,
+            "test_results": {
+                "conversion": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 0,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\" description=\"Ocekuvame na vstupu napr. 100\">\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"s\"\/>\n          <expr>\n            <send selector=\"read\">\n              <expr>\n                <literal class=\"class\" value=\"String\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"2\">\n          <var name=\"cislo\"\/>\n          <expr>\n            <send selector=\"asInteger\">\n              <expr>\n                <var name=\"s\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"3\">\n          <var name=\"vysledek\"\/>\n          <expr>\n            <send selector=\"plus:\">\n              <expr>\n                <var name=\"cislo\"\/>\n              <\/expr>\n              <arg order=\"1\">\n                <expr>\n                  <literal class=\"Integer\" value=\"50\"\/>\n                <\/expr>\n              <\/arg>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"4\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"Vysledek: \"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"5\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <send selector=\"asString\">\n                  <expr>\n                    <var name=\"vysledek\"\/>\n                  <\/expr>\n                <\/send>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"6\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"\\n\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "Vysledek: 150\n",
+                    "interpreter_stderr": "",
+                    "diff_output": null
+                }
+            }
+        },
+        "INHERITANCE": {
+            "total_points": 5,
+            "passed_points": 5,
+            "test_results": {
+                "inheritance_1": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 0,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\">\n  <class name=\"Rodic\" parent=\"Object\">\n    <method selector=\"pozdrav\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"Ahoj z Rodice\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n  <class name=\"Potomek\" parent=\"Rodic\">\n    <method selector=\"pozdrav\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"pozdrav\">\n              <expr>\n                <var name=\"super\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"2\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\" a Nazdar z Potomka\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"p\"\/>\n          <expr>\n            <send selector=\"new\">\n              <expr>\n                <literal class=\"class\" value=\"Potomek\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"2\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"pozdrav\">\n              <expr>\n                <var name=\"p\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "Ahoj z Rodice a Nazdar z Potomka",
+                    "interpreter_stderr": "",
+                    "diff_output": null
+                }
+            }
+        },
+        "POLYMORPHISM": {
+            "total_points": 3,
+            "passed_points": 3,
+            "test_results": {
+                "poly1": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 0,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\">\n  <class name=\"Zvire\" parent=\"Object\">\n    <method selector=\"zvuk\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"Nezname zvire dela zvuk\\n\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n  <class name=\"Pes\" parent=\"Zvire\">\n    <method selector=\"zvuk\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"zvuk\">\n              <expr>\n                <var name=\"super\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"2\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"Pes steka\\n\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"z\"\/>\n          <expr>\n            <send selector=\"new\">\n              <expr>\n                <literal class=\"class\" value=\"Zvire\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"2\">\n          <var name=\"p\"\/>\n          <expr>\n            <send selector=\"new\">\n              <expr>\n                <literal class=\"class\" value=\"Pes\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"3\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"Volani na Zvire:\\n\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"4\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"zvuk\">\n              <expr>\n                <var name=\"z\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"5\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"Volani na Pes:\\n\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"6\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"zvuk\">\n              <expr>\n                <var name=\"p\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "Volani na Zvire:\nNezname zvire dela zvuk\nVolani na Pes:\nNezname zvire dela zvuk\nPes steka\n",
+                    "interpreter_stderr": "",
+                    "diff_output": null
+                }
+            }
+        },
+        "ERRORS_RUNTIME": {
+            "total_points": 6,
+            "passed_points": 6,
+            "test_results": {
+                "runtime_err_1": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 53,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\">\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"divBy:\">\n              <expr>\n                <literal class=\"Integer\" value=\"10\"\/>\n              <\/expr>\n              <arg order=\"1\">\n                <expr>\n                  <literal class=\"Integer\" value=\"0\"\/>\n                <\/expr>\n              <\/arg>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "",
+                    "interpreter_stderr": "Error 53: Division by zero\n",
+                    "diff_output": null
+                },
+                "runtime_err_2": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 51,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\" description=\"Integer nema metodu 'letat'\">\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"letat\">\n              <expr>\n                <literal class=\"Integer\" value=\"5\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "",
+                    "interpreter_stderr": "Error 51: Method letat not found for class Integer\n",
+                    "diff_output": null
+                },
+                "runtime_err_3": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 54,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\" description=\"Nelze vytvorit atribut 'mojeMetoda', protoze uz existuje metoda\">\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"mojeMetoda\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"_\"\/>\n          <expr>\n            <literal class=\"Integer\" value=\"1\"\/>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"mojeMetoda:\">\n              <expr>\n                <var name=\"self\"\/>\n              <\/expr>\n              <arg order=\"1\">\n                <expr>\n                  <literal class=\"Integer\" value=\"10\"\/>\n                <\/expr>\n              <\/arg>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "",
+                    "interpreter_stderr": "Error 54: Error 54: Collision with method mojeMetoda\n",
+                    "diff_output": null
+                }
+            }
+        },
+        "ERRORS_SEMANTIC": {
+            "total_points": 4,
+            "passed_points": 4,
+            "test_results": {
+                "sem_err_1": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 34,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\">\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"b\"\/>\n          <expr>\n            <block arity=\"1\">\n              <parameter order=\"1\" name=\"param\"\/>\n              <assign order=\"1\">\n                <var name=\"param\"\/>\n                <expr>\n                  <literal class=\"Integer\" value=\"10\"\/>\n                <\/expr>\n              <\/assign>\n            <\/block>\n          <\/expr>\n        <\/assign>\n        <assign order=\"2\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"value:\">\n              <expr>\n                <var name=\"b\"\/>\n              <\/expr>\n              <arg order=\"1\">\n                <expr>\n                  <literal class=\"Integer\" value=\"5\"\/>\n                <\/expr>\n              <\/arg>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "",
+                    "interpreter_stderr": "Error 34: Cannot assign to parameter param\n",
+                    "diff_output": null
+                },
+                "sem_err_2": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 32,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\" description=\"Promenna x neni definovana prirazenim\">\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <var name=\"x\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "",
+                    "interpreter_stderr": "Error 32: Variable x not defined\n",
+                    "diff_output": null
+                }
+            }
+        },
+        "CONTROL_FLOW": {
+            "total_points": 5,
+            "passed_points": 5,
+            "test_results": {
+                "simple_control_flow": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 0,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\" description=\"Porovnani vrati True nebo False\">\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"x\"\/>\n          <expr>\n            <literal class=\"Integer\" value=\"10\"\/>\n          <\/expr>\n        <\/assign>\n        <assign order=\"2\">\n          <var name=\"y\"\/>\n          <expr>\n            <literal class=\"Integer\" value=\"20\"\/>\n          <\/expr>\n        <\/assign>\n        <assign order=\"3\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"ifTrue:ifFalse:\">\n              <expr>\n                <send selector=\"greaterThan:\">\n                  <expr>\n                    <var name=\"x\"\/>\n                  <\/expr>\n                  <arg order=\"1\">\n                    <expr>\n                      <var name=\"y\"\/>\n                    <\/expr>\n                  <\/arg>\n                <\/send>\n              <\/expr>\n              <arg order=\"1\">\n                <expr>\n                  <block arity=\"0\">\n                    <assign order=\"1\">\n                      <var name=\"_\"\/>\n                      <expr>\n                        <send selector=\"print\">\n                          <expr>\n                            <literal class=\"String\" value=\"Chyba\"\/>\n                          <\/expr>\n                        <\/send>\n                      <\/expr>\n                    <\/assign>\n                  <\/block>\n                <\/expr>\n              <\/arg>\n              <arg order=\"2\">\n                <expr>\n                  <block arity=\"0\">\n                    <assign order=\"1\">\n                      <var name=\"_\"\/>\n                      <expr>\n                        <send selector=\"print\">\n                          <expr>\n                            <literal class=\"String\" value=\"Spravne: 10 neni vetsi nez 20\"\/>\n                          <\/expr>\n                        <\/send>\n                      <\/expr>\n                    <\/assign>\n                  <\/block>\n                <\/expr>\n              <\/arg>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "Spravne: 10 neni vetsi nez 20",
+                    "interpreter_stderr": "",
+                    "diff_output": null
+                }
+            }
+        },
+        "OBJECTS": {
+            "total_points": 4,
+            "passed_points": 4,
+            "test_results": {
+                "simple_instances_1": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 0,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\" description=\"Vytvoreni atributu 'data' zaslanim zpravy s 1 arg\">\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"data:\">\n              <expr>\n                <var name=\"self\"\/>\n              <\/expr>\n              <arg order=\"1\">\n                <expr>\n                  <literal class=\"String\" value=\"Ahoj\"\/>\n                <\/expr>\n              <\/arg>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"2\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <send selector=\"data\">\n                  <expr>\n                    <var name=\"self\"\/>\n                  <\/expr>\n                <\/send>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"3\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"data:\">\n              <expr>\n                <var name=\"self\"\/>\n              <\/expr>\n              <arg order=\"1\">\n                <expr>\n                  <literal class=\"Nil\" value=\"nil\"\/>\n                <\/expr>\n              <\/arg>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"4\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <send selector=\"asString\">\n                  <expr>\n                    <send selector=\"data\">\n                      <expr>\n                        <var name=\"self\"\/>\n                      <\/expr>\n                    <\/send>\n                  <\/expr>\n                <\/send>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "Ahojnil",
+                    "interpreter_stderr": "",
+                    "diff_output": null
+                }
+            }
+        },
+        "ARITHMETIC": {
+            "total_points": 3,
+            "passed_points": 3,
+            "test_results": {
+                "simple_math_expr": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 0,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\" description=\"V\u00fdpo\u010det (10 + (5 * 2)) \/ 4 = 5\">\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"res\"\/>\n          <expr>\n            <send selector=\"divBy:\">\n              <expr>\n                <send selector=\"plus:\">\n                  <expr>\n                    <literal class=\"Integer\" value=\"10\"\/>\n                  <\/expr>\n                  <arg order=\"1\">\n                    <expr>\n                      <send selector=\"multiplyBy:\">\n                        <expr>\n                          <literal class=\"Integer\" value=\"5\"\/>\n                        <\/expr>\n                        <arg order=\"1\">\n                          <expr>\n                            <literal class=\"Integer\" value=\"2\"\/>\n                          <\/expr>\n                        <\/arg>\n                      <\/send>\n                    <\/expr>\n                  <\/arg>\n                <\/send>\n              <\/expr>\n              <arg order=\"1\">\n                <expr>\n                  <literal class=\"Integer\" value=\"4\"\/>\n                <\/expr>\n              <\/arg>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"2\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <send selector=\"asString\">\n                  <expr>\n                    <var name=\"res\"\/>\n                  <\/expr>\n                <\/send>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "5",
+                    "interpreter_stderr": "",
+                    "diff_output": null
+                }
+            }
+        },
+        "STRINGS": {
+            "total_points": 4,
+            "passed_points": 4,
+            "test_results": {
+                "string_advanced_1": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 0,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\">\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"s\"\/>\n          <expr>\n            <literal class=\"String\" value=\"Interpret\"\/>\n          <\/expr>\n        <\/assign>\n        <assign order=\"2\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"Delka: \"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"3\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <send selector=\"asString\">\n                  <expr>\n                    <send selector=\"length\">\n                      <expr>\n                        <var name=\"s\"\/>\n                      <\/expr>\n                    <\/send>\n                  <\/expr>\n                <\/send>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"4\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"\\n\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"5\">\n          <var name=\"sub\"\/>\n          <expr>\n            <send selector=\"startsWith:endsBefore:\">\n              <expr>\n                <var name=\"s\"\/>\n              <\/expr>\n              <arg order=\"1\">\n                <expr>\n                  <literal class=\"Integer\" value=\"1\"\/>\n                <\/expr>\n              <\/arg>\n              <arg order=\"2\">\n                <expr>\n                  <literal class=\"Integer\" value=\"6\"\/>\n                <\/expr>\n              <\/arg>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"6\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"Podretezec: \"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"7\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <var name=\"sub\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"8\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"\\n\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"9\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <send selector=\"concatenateWith:\">\n                  <expr>\n                    <var name=\"s\"\/>\n                  <\/expr>\n                  <arg order=\"1\">\n                    <expr>\n                      <literal class=\"String\" value=\" SOL26\"\/>\n                    <\/expr>\n                  <\/arg>\n                <\/send>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"10\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <literal class=\"String\" value=\"\\n\"\/>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "Delka: 9\nPodretezec: Inter\nInterpret SOL26\n",
+                    "interpreter_stderr": "",
+                    "diff_output": null
+                },
+                "string_oper_1": {
+                    "result": "passed",
+                    "parser_exit_code": 0,
+                    "interpreter_exit_code": 0,
+                    "parser_stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program language=\"SOL26\" description=\"Vypise Inter\">\n  <class name=\"Main\" parent=\"Object\">\n    <method selector=\"run\">\n      <block arity=\"0\">\n        <assign order=\"1\">\n          <var name=\"s\"\/>\n          <expr>\n            <literal class=\"String\" value=\"Interpret\"\/>\n          <\/expr>\n        <\/assign>\n        <assign order=\"2\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <send selector=\"asString\">\n                  <expr>\n                    <send selector=\"length\">\n                      <expr>\n                        <var name=\"s\"\/>\n                      <\/expr>\n                    <\/send>\n                  <\/expr>\n                <\/send>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n        <assign order=\"3\">\n          <var name=\"_\"\/>\n          <expr>\n            <send selector=\"print\">\n              <expr>\n                <send selector=\"startsWith:endsBefore:\">\n                  <expr>\n                    <var name=\"s\"\/>\n                  <\/expr>\n                  <arg order=\"1\">\n                    <expr>\n                      <literal class=\"Integer\" value=\"1\"\/>\n                    <\/expr>\n                  <\/arg>\n                  <arg order=\"2\">\n                    <expr>\n                      <literal class=\"Integer\" value=\"6\"\/>\n                    <\/expr>\n                  <\/arg>\n                <\/send>\n              <\/expr>\n            <\/send>\n          <\/expr>\n        <\/assign>\n      <\/block>\n    <\/method>\n  <\/class>\n<\/program>\n",
+                    "parser_stderr": "",
+                    "interpreter_stdout": "9Inter",
+                    "interpreter_stderr": "",
+                    "diff_output": null
+                }
+            }
         }
     }
 }

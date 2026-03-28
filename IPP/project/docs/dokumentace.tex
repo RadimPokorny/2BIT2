@@ -50,6 +50,21 @@ Kontroluje se také arita metod, kde je nutné splňovat pravidlo počtu dvojte�
 Jakmile je provedena sémantická analýza, je buďto vrácen určený chybový stav nebo se přejde na rekurziní vykonání programu,
 který využívá datovou strukturu \texttt{Environment}.
 
+Celková architektura je řešena modulárně, kde se syntaktická validace, sémantická analýza a běh programu provadí na různých místech.
+Během návrhu byl kladen důraz i na přehlednost a využití tříd pro jednotlivé datové struktury, které jsou zmíněny v příští kapitole.
+
+Po dokončení sestavení syntaktického stromu následuje fáze sémantické analýzy, kde interpret prochází deklarace všech objektů a metod.
+Tyto objekty jsou průběžně ukládány do slovníků, avšak prvním pravidlem je vždy ověření existence objektu \texttt{Main} a jeho metody \texttt{run}.
+Dále se provádí kontrola arity metod, přičemž v jazyce \texttt{SOL26} je přítmnost znaku \texttt{:} poměrně velká obtíž, která si žádá důslednou režii.
+
+Základem vykonávání programu je prochází syntaktického stromu rekurzivně. Během průchodu dochází k zasílání zpráv mezi objekty, kde se vykonávají instrukce.
+U nich musí být vždy jasné kdo je odesílá a její příjemce. Dále hledá implementaci vykonávané metody pomocí metody \texttt{lookup}, kde se směrem k rodiči postupně snaží dostat
+ke svému cíly, což umožňuje použití dědičnosti a polymorfismu.
+
+Aby byl zachován správně rozsah platnosti, je využita implementovaná třída \texttt{Environment}. Každé volání metody a deklarace bloku vytváří novou instanci této třídy.
+Tato třída zajištujě obecný přehled a je jedním z nejdůležitějších stavebních kamenů implementace.
+
+
 \begin{figure}[ht!]
     \centering
     \includegraphics[width=1.0\textwidth]{int_class.png}
@@ -135,8 +150,8 @@ by uživatel mohl elegantně měnit stav objektů mimo samotný blok.
 
 \section{Využití generativní umělé inteligence}
 Během implementace, sprovoznění projektu, návrhu Dockerfile apod. byly použity jazykové modely \texttt{ChatGPT} a \texttt{Gemini}.
-Pomohli mi také objasnit mé zkušenosti o OOP ze střední školy, které jsem si musel znovu připomenout a trochu obohatit.
-Dále mi byla velmi nápomocna při učení jazyka Python a návrhu datových struktur či konverze mých myšlenek do Python kódu.
+Pomohli mi také objasnit mé zkušenosti s OOP ze střední školy, které jsem si musel znovu připomenout a trochu obohatit.
+Dále mi byla velmi nápomocna při vysvětlení návrhových vzorů a pokročilejších úvah, kdy jsem potom měl lepší představu o implementaci.
 Konverzace s umělou inteligencí jsou přiloženy odkazem v souboru \texttt{ai-chatgpt.md} a \texttt{ai-gemini.md}.
 
 \end{document}

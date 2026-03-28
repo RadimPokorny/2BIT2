@@ -1,5 +1,0 @@
-lark==1.2.2
-lxml~=5.3.2
-pydantic~=2.12.5
-pydantic-xml[lxml]~=2.19.0
-

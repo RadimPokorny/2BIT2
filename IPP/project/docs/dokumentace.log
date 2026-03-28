@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.3.6)  8 MAR 2026 10:29
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.3.6)  27 MAR 2026 21:57
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -309,14 +309,14 @@ l.39 \newpage
 <int_class.png, id=93, 659.46375pt x 1069.9975pt>
 File: int_class.png Graphic file (type png)
 <use int_class.png>
-Package pdftex.def Info: int_class.png  used on input line 55.
+Package pdftex.def Info: int_class.png  used on input line 70.
 (pdftex.def)             Requested size: 390.0pt x 632.79512pt.
 
 
-LaTeX Warning: Float too large for page by 67.62843pt on input line 58.
+LaTeX Warning: Float too large for page by 67.62843pt on input line 73.
 
 [2] [3 <./int_class.png>]
-Underfull \hbox (badness 2197) in paragraph at lines 73--75
+Underfull \hbox (badness 2197) in paragraph at lines 88--90
 \OT1/cmr/m/n/12 Architektura pro-jektu vyu^^Tz^^S^^Pv^^Sa OO pa-ra-digma pro le
 p^^Ts^^S^^P de-kom-po-zici
  []
@@ -324,7 +324,7 @@ p^^Ts^^S^^P de-kom-po-zici
 [4
 
 ]
-Underfull \hbox (badness 1048) in paragraph at lines 100--105
+Underfull \hbox (badness 1048) in paragraph at lines 115--120
 \OT1/cmr/m/n/12 B^^Tehem tes-tov^^San^^S^^P in-ter-pretu jed-not-liv^^Symi pro-
 gramy do^^Tslo na vy-hod-no-
  []
@@ -338,17 +338,17 @@ Package rerunfilecheck Info: File `dokumentace.out' has not changed.
 (rerunfilecheck)             Checksum: F4B5268A42F2A50F033E2E9B3BEB1094;3004.
  ) 
 Here is how much of TeX's memory you used:
- 9657 strings out of 475350
- 153495 string characters out of 5770205
+ 9658 strings out of 475350
+ 153503 string characters out of 5770205
  1933975 words of memory out of 5000000
- 31608 multiletter control sequences out of 15000+600000
+ 31609 multiletter control sequences out of 15000+600000
  563098 words of font info for 53 fonts, out of 8000000 for 9000
  428 hyphenation exceptions out of 8191
  75i,6n,79p,334b,463s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on dokumentace.pdf (7 pages, 130852 bytes).
+Output written on dokumentace.pdf (7 pages, 133048 bytes).
 PDF statistics:
  141 PDF objects out of 1000 (max. 8388607)
  120 compressed objects within 2 object streams

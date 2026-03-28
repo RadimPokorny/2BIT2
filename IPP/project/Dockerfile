@@ -33,11 +33,13 @@ COPY tester/ ./tester/
 FROM python:${PYTHON_VERSION} AS runtime
 WORKDIR /src
 RUN apt-get update && apt-get install -y \
-    libxml2 \
-    libxslt1.1 \
+    libxml2 libxslt1.1 \
+    libxml2-dev libxslt-dev gcc zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 COPY int/requirements.txt ./int/
-RUN pip install --no-cache-dir -r ./int/requirements.txt
+COPY ./tester/requirements.txt ./
+RUN pip install --no-cache-dir -r ./int/requirements.txt -r ./requirements.txt
+RUN apt-get purge -y libxml2-dev libxslt-dev gcc zlib1g-dev && apt-get autoremove -y
 COPY --from=build /app/int ./int
 ENTRYPOINT ["python3", "int/src/solint.py"]
 
@@ -47,5 +49,5 @@ RUN apt-get update && apt-get install -y \
     php-cli php-xml php-mbstring \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=build-test /app/tester ./tester
-
+COPY /tester/sol_to_xml.py ./
 ENTRYPOINT ["php", "tester/src/tester.php"]

@@ -25,6 +25,7 @@ use IPP\Tester\Model\TestCaseType;
 use IPP\Tester\Model\TestCaseReport;
 use IPP\Tester\Model\CategoryReport;
 use IPP\Tester\Model\UnexecutedReason;
+use IPP\Tester\Model\UnexecutedReasonCode;
 use IPP\Tester\Model\TestResult;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\AbstractHandler;
@@ -138,8 +139,9 @@ class TesterApp
 
     /**
      * Parses a single .test file and discovers associated files.
-     * * @param string $filePath Path to the .test file.
-     * @return array The parsed test case definition.
+     *
+     * @param string $filePath Path to the .test file.
+     * @return array{definition: TestCaseDefinition, source: string}
      * @throws RuntimeException If the file cannot be read.
      */
     private function parseTestFile(string $filePath): array
@@ -149,7 +151,6 @@ class TesterApp
             throw new RuntimeException("Failed to read file: $filePath");
         }
 
-        // Splitting up the code and the header
         $lines = explode("\n", $content);
         $name = pathinfo($filePath, PATHINFO_FILENAME);
         $dir = dirname($filePath);
@@ -162,12 +163,10 @@ class TesterApp
         $sourceCodeLines = [];
         $headerFinished = false;
 
-        // Process the non-code entities in the test file header
         foreach ($lines as $line) {
             $lineR = trim($line, "\r\n");
 
             if (!$headerFinished) {
-                // Metadata detection
                 if (str_starts_with($lineR, '***')) {
                     $description = trim(substr($lineR, 3));
                     continue;
@@ -188,20 +187,29 @@ class TesterApp
                 if (trim($lineR) !== "") {
                     $headerFinished = true;
                 } else {
-                    // Skip the empty rows
                     continue;
                 }
             }
-            // Get the SOL26 code
             $sourceCodeLines[] = $line;
         }
 
-        // Normalize the input code
-        $sourceCode = implode("\n", $sourceCodeLines);
-        $type = (empty($expectedC) && !empty($expectedI)) ? TestCaseType::EXECUTE_ONLY : TestCaseType::COMBINED;
-        if (!empty($expectedC) && empty($expectedI)) $type = TestCaseType::PARSE_ONLY;
+        // A test is ambiguous if it lacks BOTH tags.
+        // If ambigous1.test has !I! 54, it is NOT ambiguous according to this.
+        if (empty($expectedC) && empty($expectedI)) {
+            throw new RuntimeException("Cannot determine the type");
+        }
 
-        // Check the existence (out and in file are optional)
+        // Determine the type
+        if (!empty($expectedC) && empty($expectedI)) {
+            $type = TestCaseType::PARSE_ONLY;
+        } elseif (empty($expectedC) && !empty($expectedI)) {
+            $type = TestCaseType::EXECUTE_ONLY;
+        } else {
+            $type = TestCaseType::COMBINED;
+        }
+
+        $sourceCode = implode("\n", $sourceCodeLines);
+
         $definition = new TestCaseDefinition(
             $name, $filePath, $type, $category,
             file_exists("$dir/$name.in") ? "$dir/$name.in" : null,
@@ -242,35 +250,57 @@ class TesterApp
      *
      * @return int The process exit code.
      */
+    /**
+     * Executes the testing logic.
+     *
+     * @return int The process exit code.
+     */
     public function run(): int
     {
-        // Return the specified code if there is no directory to be tested
+        // Check if the provided directory exists
         if (!is_dir($this->arguments->testsDir)) {
             return 1;
         }
 
+        // Find all .test files in the directory
         $paths = $this->findTestFilePaths($this->arguments->testsDir, $this->arguments->recursive);
+        
         $discoveredTestCases = [];
         $unexecuted = [];
-
         $catResults = [];
         $catScores = [];
         $catTotals = [];
 
-        // Process all the tests
         foreach ($paths as $path) {
-            $testName = pathinfo($path, PATHINFO_FILENAME);
             try {
+                // Try to parse the test file and its metadata
+                // If it fails here, it goes straight to the catch block (code 2)
                 $parsed = $this->parseTestFile($path);
                 $test = $parsed['definition'];
                 $sourceCode = $parsed['source'];
 
+                // Add to the list of successfully discovered tests
                 $discoveredTestCases[] = $test;
 
-                if (!$this->shouldIncludeTest($test) || $this->arguments->dryRun) {
+                // Check if the test should be included based on CLI filters
+                if (!$this->shouldIncludeTest($test)) {
+                    $unexecuted[$path] = new UnexecutedReason(
+                        UnexecutedReasonCode::FILTERED_OUT,
+                        "Test got filtered out."
+                    );
                     continue;
                 }
 
+                // Handle the dry-run argument
+                if ($this->arguments->dryRun) {
+                    $unexecuted[$path] = new UnexecutedReason(
+                        UnexecutedReasonCode::OTHER,
+                        "Skipped due to dry-run."
+                    );
+                    continue;
+                }
+
+                // Prepare category result tracking
                 $cat = $test->category;
                 if (!isset($catResults[$cat])) {
                     $catResults[$cat] = [];
@@ -278,29 +308,39 @@ class TesterApp
                     $catTotals[$cat] = 0;
                 }
 
-                // Add the total points to the category
+                // Add possible points to the category total
                 $catTotals[$cat] += $test->points;
 
+                // Execute the test and store the report
                 $testCaseReport = $this->executeTestCase($test, $sourceCode);
                 $catResults[$cat][$test->name] = $testCaseReport;
 
-                // Add points to the succesful category
+                // Update category score if the test passed
                 if ($testCaseReport->result === TestResult::PASSED) {
                     $catScores[$cat] += $test->points;
                 }
 
             } catch (\Exception $e) {
-                $unexecuted[$testName] = new UnexecutedReason($e->getMessage());
+                // Catch any parsing error (like "Cannot determine the type")
+                // These appear as code 2 in the output JSON
+                $unexecuted[$path] = new UnexecutedReason(
+                    UnexecutedReasonCode::CANNOT_EXECUTE,
+                    $e->getMessage()
+                );
             }
         }
 
+        // Build final reports for each category
         $finalCategoryReports = [];
-        foreach ($catResults as $catName => $tests) $finalCategoryReports[$catName] = new CategoryReport(
-            $catTotals[$catName], // Total
-            $catScores[$catName], // Passed
-            $tests
-        );
+        foreach ($catResults as $catName => $tests) {
+            $finalCategoryReports[$catName] = new CategoryReport(
+                $catTotals[$catName],
+                $catScores[$catName],
+                $tests
+            );
+        }
 
+        // Create the final test report and output it
         $report = new TestReport($discoveredTestCases, $unexecuted, $finalCategoryReports);
         $this->writeResult($report);
 
@@ -309,8 +349,10 @@ class TesterApp
 
     /**
      * Runs an external command and captures its output.
-     * * @param list<string> $cmd The command to execute.
+     *
+     * @param list<string> $cmd The command to execute.
      * @param string|null $stdinPath Path to the file for standard input.
+     * @param array<string, string>|null $env Environment variables.
      * @return array{code: int, stdout: string, stderr: string}
      * @throws RuntimeException If the command fails to start.
      */
@@ -324,15 +366,15 @@ class TesterApp
 
         $process = proc_open($cmd, $descriptors, $pipes, null, $env);
         if (!is_resource($process)) {
-            throw new RuntimeException("Failed to execute command: " . implode(' ', $cmd));
+            throw new RuntimeException("Failed to execute command.");
         }
 
         if (!$stdinPath) {
             fclose($pipes[0]);
         }
 
-        $stdout = stream_get_contents($pipes[1]);
-        $stderr = stream_get_contents($pipes[2]);
+        $stdout = (string)stream_get_contents($pipes[1]);
+        $stderr = (string)stream_get_contents($pipes[2]);
 
         fclose($pipes[1]);
         fclose($pipes[2]);
@@ -350,8 +392,12 @@ class TesterApp
      */
     private function executeTestCase(TestCaseDefinition $test, string $sourceCode): TestCaseReport
     {
-        $parserExitCode = null; $parserStdout = null; $parserStderr = null;
-        $interpreterExitCode = null; $interpreterStdout = null; $interpreterStderr = null;
+        $parserExitCode = null;
+        $parserStdout = null;
+        $parserStderr = null;
+        $interpreterExitCode = null;
+        $interpreterStdout = null;
+        $interpreterStderr = null;
         $diff = null;
         $tempFiles = [];
 
@@ -378,9 +424,11 @@ class TesterApp
 
         // Interpretation
         // If parser has been executed correctly we can execute (if it is allowed)
-        if ($test->testType === TestCaseType::EXECUTE_ONLY ||
-            ($test->testType === TestCaseType::COMBINED && $parserExitCode === 0)) {
-
+        if (
+            $test->testType === TestCaseType::EXECUTE_ONLY
+            || ($test->testType === TestCaseType::COMBINED
+                && $parserExitCode === 0)
+        ) {
             // Setting up the PYTHON path
             $cmd = [
                 'python3',
@@ -424,7 +472,7 @@ class TesterApp
         }
 
         // Control of the DIFF output
-        if ($isCodeOk && $finalResult === TestResult::PASSED) {
+        if ($isCodeOk) {
             $lastExitCode = ($test->testType === TestCaseType::PARSE_ONLY) ? $parserExitCode : $interpreterExitCode;
 
             if ($lastExitCode === 0 && $test->expectedStdoutFile) {
@@ -432,7 +480,8 @@ class TesterApp
                 $actualClean = trim(str_replace("\r", "", $interpreterStdout ?? ""));
 
                 // If there is no file we use the empty string
-                $expectedRaw = file_exists($test->expectedStdoutFile) ? file_get_contents($test->expectedStdoutFile) : "";
+                $expectedRaw = file_exists($test->expectedStdoutFile)
+                    ? file_get_contents($test->expectedStdoutFile) : "";
                 $expectedClean = trim(str_replace("\r", "", $expectedRaw ?: ""));
 
                 // Temporary files for the DIFF output
@@ -456,7 +505,9 @@ class TesterApp
 
         // Cleaning up the temporary files
         foreach ($tempFiles as $f) {
-            if (file_exists($f)) @unlink($f);
+            if (file_exists($f)) {
+                @unlink($f);
+            }
         }
 
         return new TestCaseReport(
@@ -483,13 +534,19 @@ class TesterApp
 
         // String and regex control
         $matches = function (string $subject, ?array $filters) use ($useRegex): bool {
-            if ($filters === null) return false;
+            if ($filters === null) {
+                return false;
+            }
             foreach ($filters as $f) {
                 if ($useRegex) {
                     // @ is only the splitter
-                    if (preg_match('@' . $f . '@', $subject)) return true;
+                    if (preg_match('@' . $f . '@', $subject)) {
+                        return true;
+                    }
                 } else {
-                    if ($subject === $f) return true;
+                    if ($subject === $f) {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -501,19 +558,23 @@ class TesterApp
         $isIncluded = !$hasInclude;
 
         if ($hasInclude) {
-            if ($matches($test->name, $args->include) ||
+            if (
+                $matches($test->name, $args->include) ||
                 $matches($test->name, $args->includeTest) ||
                 $matches($test->category, $args->include) ||
-                $matches($test->category, $args->includeCategory)) {
+                $matches($test->category, $args->includeCategory)
+            ) {
                 $isIncluded = true;
             }
         }
 
         // Exclude argument logic
-        if ($matches($test->name, $args->exclude) ||
-            $matches($test->name, $args->excludeTest) ||
-            $matches($test->category, $args->exclude) ||
-            $matches($test->category, $args->excludeCategory)) {
+        if (
+            $matches($test->name, $args->exclude)
+            || $matches($test->name, $args->excludeTest)
+            || $matches($test->category, $args->exclude)
+            || $matches($test->category, $args->excludeCategory)
+        ) {
             return false;
         }
 

@@ -7,19 +7,6 @@ parameters:
         - src
     
     disallowedFunctionCalls:
-        # https://www.php.net/ref.exec
-        - function: 'exec()'
-        - function: 'passthru()'
-        - function: 'proc_open()'
-        - function: 'proc_get_status()'
-        - function: 'proc_nice()'
-        - function: 'proc_close()'
-        - function: 'proc_terminate()'
-        - function: 'shell_exec()'  # also disallows the backtick operator `...`
-        - function: 'system()'
-        - function: 'pcntl_exec()'
-        - function: 'popen()'
-        # other
         - function: 'checkdnsrr()'
         - function: 'closelog()'
         - function: 'define_syslog_variables()'

@@ -393,15 +393,17 @@ class Interpreter:
         n = int(receiver.get("val", 0))
         last_res = self.nil_obj
         block = args[0]
-        # Does block have a parameters?
-        has_p = len(block.get("val", {}).get("node").parameters or []) > 0
+
+        # Is argument really a block?
+        if not (block.get("class") == "Block"
+                or self._is_subclass(str(block.get("class")), "Block")):
+            raise InterpreterError(ErrorCode.INT_INVALID_ARG,
+                                   "Argument for timesRepeat: must be a block")
 
         for i in range(1, n + 1):
             idx_obj = self._create_obj("Integer", i)
-            if has_p:
-                last_res = self.call_method(block, "value:", [idx_obj])
-            else:
-                last_res = self.call_method(block, "value", [])
+            # Send a value with an index
+            last_res = self.call_method(block, "value:", [idx_obj])
         return last_res
 
     def _handle_block_methods(
@@ -416,7 +418,7 @@ class Interpreter:
                 return self.nil_obj
             # Check the arity
             if len(args) != len(data["node"].parameters or []):
-                raise InterpreterError(ErrorCode.SEM_ARITY, "Wrong number of arguments for block")
+                raise InterpreterError(ErrorCode.INT_DNU, "Wrong number of arguments for block")
             # Execute the block in the specific environment
             return self.execute_block(
                 data["node"], args, data["captured_env"], defining_class=data.get("defining_class")
@@ -527,37 +529,22 @@ class Interpreter:
         return None
 
     def call_method(
-        self,
-        receiver: Any,
-        selector: str,
-        args: list[dict[str, Any]],
-        defining_class: str | None = None,
-        use_super: bool = False,
+            self,
+            receiver: Any,
+            selector: str,
+            args: list[dict[str, Any]],
+            defining_class: str | None = None,
+            use_super: bool = False,
     ) -> dict[str, Any]:
         """Global function to handle the methods in the program"""
-        if isinstance(receiver, dict) and receiver.get("_is_super_wrapper"):
-            use_super = True
-            receiver = receiver["_inner_obj"]
 
-        r_cls = receiver.get("class")
-        if r_cls == "Block" and defining_class is None:
-            defining_class = receiver.get("val", {}).get("defining_class")
+        r_cls = str(receiver.get("class"))
 
         # Class-level messages
         if receiver.get("is_class"):
             return self._handle_static_methods(r_cls, selector, args)
 
-        # Universal Object methods
-        res = self._handle_universal_methods(receiver, r_cls, selector, args)
-        if res is not None:
-            return res
-
-        # Built-in Class Specializations
-        res = self._handle_builtin_specializations(receiver, r_cls, selector, args)
-        if res is not None:
-            return res
-
-        # User-defined Method Lookup
+        # Super call setup
         start_lookup = r_cls
         if use_super:
             ctx_class = self.classes.get(str(defining_class))
@@ -566,19 +553,30 @@ class Interpreter:
             else:
                 raise InterpreterError(ErrorCode.INT_DNU, f"Super method {selector} not found")
 
-        # Find a method in the environment
+        # User-defined Method Lookup
+        # First check if the user wrote this method
         method, method_class = self._find_method(start_lookup, selector)
         if method:
             method_env = Environment()
             method_env.values["self"] = receiver
             return self.execute_block(method.block, args, method_env, defining_class=method_class)
 
+        # Built-in Class Specializations
+        res = self._handle_builtin_specializations(receiver, r_cls, selector, args)
+        if res is not None:
+            return res
+
+        # Universal Object methods
+        res = self._handle_universal_methods(receiver, r_cls, selector, args)
+        if res is not None:
+            return res
+
         # Attribute access (Getters/Setters)
         res = self._handle_attribute_access(receiver, selector, args, start_lookup)
         if res is not None:
             return res
 
-        # If everything fails
+        # Error 51 if we reached the end
         raise InterpreterError(ErrorCode.INT_DNU, f"Method {selector} not found for class {r_cls}")
 
     def _resolve_variable_name(self, name: str, env: Environment) -> dict[str, Any]:
@@ -601,8 +599,7 @@ class Interpreter:
             return cast(dict[str, Any], env.lookup("self"))
 
         if name == "super":
-            obj = env.lookup("self")
-            return {"_is_super_wrapper": True, "_inner_obj": obj}
+            return cast(dict[str, Any], env.lookup("self"))
 
         # Check if we know the object name
         builtin_classes = {"Integer", "String", "Object", "Nil", "True", "False", "Block"}
@@ -641,11 +638,21 @@ class Interpreter:
         # If we have a sender flag evaluate the expression
         if expr_node.send:
             s = expr_node.send
+
+            # Let's find out if the receiver is explicitly 'super'
+            is_super_call = False
+            if s.receiver.var and s.receiver.var.name == "super":
+                is_super_call = True
+
             recv = self.evaluate_expr(s.receiver, env, defining_class)
-            # Evaluate arguments in the current environment
+
+            # Evaluate the args
             actual_args = [self.evaluate_expr(a.expr, env, defining_class) for a in s.args]
 
-            return self.call_method(recv, s.selector, actual_args, defining_class=defining_class)
+            # Give is_super_call to the existing function
+            return self.call_method(recv, s.selector, actual_args,
+                                    defining_class=defining_class,
+                                    use_super=is_super_call)
 
         return self._create_obj("Nil")
 

@@ -1,0 +1,31 @@
+
+attributes {
+    zanr : rock pop jazz elektronicka
+    podium : male stredni velke
+    den : ctvrtek patek sobota
+    pocasi : slunecno zatazeno dest
+}
+
+classes {
+    Mala
+    Stredni
+    Velka
+}
+
+objects {
+    1 Stredni jazz velke patek zatazeno
+    2 Velka rock male ctvrtek zatazeno
+    3 Velka pop stredni patek zatazeno
+    4 Stredni elektronicka stredni sobota dest
+    5 Stredni elektronicka male patek dest
+    6 Velka elektronicka velke sobota dest
+    7 Mala elektronicka stredni patek dest
+    8 Mala pop male ctvrtek dest
+    9 Stredni elektronicka velke sobota slunecno
+    10 Stredni jazz velke sobota zatazeno
+    11 Stredni pop stredni ctvrtek slunecno
+    12 Velka pop male ctvrtek zatazeno
+    13 Velka rock velke sobota slunecno
+    14 Velka rock male sobota dest
+    15 Stredni jazz male sobota dest
+}

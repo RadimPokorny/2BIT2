@@ -1,7 +1,9 @@
 # 2BIT2
 
-Tento repositář slouží pouze jako inspirace a reference pro budoucí studenty, rozhodně nedoporučuji kód kopírovat a odevzdávat za své řešení, můžete být pohnáni k disciplinární komisi.
+This repository is intended solely as inspiration and a reference for future students. I strongly advise against copying the code and submitting it as your own solution, as you may face disciplinary action.
 
+
+## Grading (the repository is not complete and is missing some files)
 - IDS
     - **Project 1:** 5/5
     - **Project 2:** 5/5

@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/2BIT2/IVS/project1",
-      "program": "c:/2BIT2/IVS/project1/build/Debug/outDebug",
+      "cwd": "c:/2BIT2/IZU/proj3",
+      "program": "c:/2BIT2/IZU/proj3/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

@@ -37,3 +37,8 @@ Thumbs.db
 **/*.ilk
 **/*.vsidx
 IPP/project/tester/*.json
+
+IPP/project/int/mypy
+IPP/project/int/ruff
+IPP/project/tester/phpcs
+IPP/project/tester/phpstan

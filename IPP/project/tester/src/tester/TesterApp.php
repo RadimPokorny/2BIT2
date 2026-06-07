@@ -202,19 +202,22 @@ class TesterApp
         // Determine the type
         if (!empty($expectedC) && empty($expectedI)) {
             $type = TestCaseType::PARSE_ONLY;
-        } elseif (empty($expectedC) && !empty($expectedI)) {
+        } elseif (empty($expectedC)) {
             $type = TestCaseType::EXECUTE_ONLY;
         } else {
             $type = TestCaseType::COMBINED;
         }
-
         $sourceCode = implode("\n", $sourceCodeLines);
 
         $definition = new TestCaseDefinition(
-            $name, $filePath, $type, $category,
+            $name,
+            $filePath,
+            $type,
+            $category,
             file_exists("$dir/$name.in") ? "$dir/$name.in" : null,
             file_exists("$dir/$name.out") ? "$dir/$name.out" : null,
-            $description, $points,
+            $description,
+            $points,
             !empty($expectedC) ? $expectedC : null,
             !empty($expectedI) ? $expectedI : null
         );
@@ -263,8 +266,11 @@ class TesterApp
         }
 
         // Find all .test files in the directory
-        $paths = $this->findTestFilePaths($this->arguments->testsDir, $this->arguments->recursive);
-        
+        $paths = $this->findTestFilePaths(
+            $this->arguments->testsDir,
+            $this->arguments->recursive
+        );
+
         $discoveredTestCases = [];
         $unexecuted = [];
         $catResults = [];
@@ -319,7 +325,6 @@ class TesterApp
                 if ($testCaseReport->result === TestResult::PASSED) {
                     $catScores[$cat] += $test->points;
                 }
-
             } catch (\Exception $e) {
                 // Catch any parsing error (like "Cannot determine the type")
                 // These appear as code 2 in the output JSON

@@ -59,7 +59,7 @@ Dále se provádí kontrola arity metod, přičemž v jazyce \texttt{SOL26} je p
 
 Základem vykonávání programu je prochází syntaktického stromu rekurzivně. Během průchodu dochází k zasílání zpráv mezi objekty, kde se vykonávají instrukce.
 U nich musí být vždy jasné kdo je odesílá a její příjemce. Dále hledá implementaci vykonávané metody pomocí metody \texttt{lookup}, kde se směrem k rodiči postupně snaží dostat
-ke svému cíly, což umožňuje použití dědičnosti a polymorfismu.
+ke svému cíli, což umožňuje použití dědičnosti a polymorfismu.
 
 Aby byl zachován správně rozsah platnosti, je využita implementovaná třída \texttt{Environment}. Každé volání metody a deklarace bloku vytváří novou instanci této třídy.
 Tato třída zajištujě obecný přehled a je jedním z nejdůležitějších stavebních kamenů implementace.
@@ -96,7 +96,7 @@ do implementace logiky.
 
 \subsection{Řetězec zodpovědnosti}
 Tento princip je schopen fungovat díky implementaci datové strukury \texttt{Environment}. Jakékoliv prostředí drží odkaz na svého
-rodiče a díky tomuto vzniká koncept lineární hiearchie, kde se požadavky typu \texttt{assign} nebo třeba \texttt{lookup} zpropagují
+rodiče a díky tomuto vzniká koncept lineární hierarchie, kde se požadavky typu \texttt{assign} nebo třeba \texttt{lookup} zpropagují
 nahoru, dokud se v příslušném prostředí nenalezne hledaný identifikátor. Tento princip je pro implementaci a optimalizaci velmi vhodný
 vzhledem k tomu, že by šlo ještě použít globální tabulku symbolů, což by bylo mnohem méně vhodné.
 
@@ -109,7 +109,7 @@ správnost logických operací kdekoliv v programu.
 \section{Problémy a výzvy během implementace}
 Během implementace interpretu bylo třeba pochopit více do hloubky jazyk Python a také přesně definovat typy
 proměnných v kódu, což přinášelo mnoho problémů. Dále některé koncepty OOP, na které byl brán větší ohled 
-až v~nerané fázi programování, způsobily mnoho komplexních výzev.
+až v~ne úplně rané fázi programování, způsobily mnoho komplexních výzev.
 
 \subsection{Problém s logickými hodnotami}
 Během testování interpretu jednotlivými programy došlo na vyhodnocení výrazu \texttt{false == false}, kde se jako výsledek očekává
@@ -133,25 +133,37 @@ svého volajícího, ale ve svém nadřazeném. Řešení bylo nakonec triviáln
 Stačilo danému bloku přidat referenci na aktuální \texttt{Environment}.
 
 \section{Zamyšlení nad možnostmi dalšího rozšíření}
-Interpret myslí na nejrůznejší případy a dalo by se tedy usoudit, že je poměrně komplexní a kompletní.
-Avšak jazyk SOL26 by mohl přinést jisté aktualizace, na které by byl interpret předem připraven.
+Byly vybrány 3 rozšíření, které by šli hladce implementovat vzhledem k již uvedeném návrhu.
 
-\subsection{Podpora desetinných čísel}
-Toto rozšíření by bylo poměrně jednoduché, ale i tak stále by bylo třeba dbát ohled na desetinnou tečku,
-která by mohla být špatně interpretována. Ideou by bylo přidat novou metodu \texttt{\_create\_obj} a s ní 
-společně metodu \texttt{\_handle\_float\_methods}. Jako poslední by se upravily podmínky pro typy operací, kde
-by se přidaly případy pro přetypování mezi typy \texttt{Float} a \texttt{Int}.
+\subsection{Třídy jako objekty první kategorie}
+Toto rozšíření by šlo teoreticky implementovat, jelikož v kódu se důmyslně rozlišují statické a instanční metody ve funkci \texttt{\_handle\_static\_methods}.
+Ve slovníku \texttt{self.classes} by se prvky retransformovali na objekty instance metatřídy \texttt{Class}. Její metody by mohly být uloženy v samostatné
+tabulce metod, kde by vyhledávání spočívalo ve sdílení instančních metod po pár úpravách metody \texttt{\_find\_method}.
 
-\subsection{Iterační konstrukce Do a Foreach}
-Interpret pracuje s jednotlivými bloky bez chyby, což dává pevný základ všem možným iterátorům.
-Metoda \texttt{Do:} by postupně přidávala prvky sekvence čísel do bloku, což by přidalo pouze jednu metodu 
-do kolekce \texttt{Dispatchers}. Třída \texttt{Environment} již uchovává vazbu na okolní proměnné, a tak
-by uživatel mohl elegantně měnit stav objektů mimo samotný blok.
+\subsection{Modifikátory přístupu}
+V interpretu se výrazy vyhodnocují rekurzivně v metodě \texttt{evaluate\_expr}, která do následně volané metody \texttt{call\_method} 
+již předává parametr \texttt{defining\_class}. Tento parametr reprezentuje třídu, ve které je volání prováděno, 
+a definuje tak kontext odesílatele zprávy.
+Při vyhledávání metody v mechanismu \texttt{lookup} by se nově kontrolovala viditelnost. Logika by porovnala kontext v \texttt{defining\_class} s třídou, 
+kde byla metoda nalezena. Pomocí existující metody \texttt{\_is\_subclass} by se ověřilo, 
+zda je odesílatel v hierarchii dědičnosti oprávněn k přístupu.
+Pokud by podmínky nebyly splněny, interpret by vyvolal chybu nenalezení metody. Celkově by tedy nebylo nutné měnit architekturu, 
+pouze doplnit logiku do lookup mechanismu.
+
+\subsection{Mechanismus \texttt{doesNotUnderstand}}
+V návrhu \texttt{call\_method} by bylo toto rozšíření poměrně triviální záležitost. V podstatě místo výjimky \texttt{InterpreterError} v této metodě by
+se vytvořila instance třídy \texttt{Message}, která by obsahovala vnitřní stav \texttt{val} původního selektoru a zbytek jeho argumentů.
+Díky návrhu interpretu, kde se veškerý \texttt{Dispatching} odehrává na jednom místě, není třeba zasahovat do implementace vyhodnocení výrazů a celkově
+sémantických kontrol.
 
 \section{Využití generativní umělé inteligence}
-Během implementace, sprovoznění projektu, návrhu Dockerfile apod. byly použity jazykové modely \texttt{ChatGPT} a \texttt{Gemini}.
+Během implementace, zprovoznění projektu, návrhu Dockerfile apod. byly použity jazykové modely \texttt{ChatGPT} a \texttt{Gemini}.
 Pomohli mi také objasnit mé zkušenosti s OOP ze střední školy, které jsem si musel znovu připomenout a trochu obohatit.
 Dále mi byla velmi nápomocna při vysvětlení návrhových vzorů a pokročilejších úvah, kdy jsem potom měl lepší představu o implementaci.
 Konverzace s umělou inteligencí jsou přiloženy odkazem v souboru \texttt{ai-chatgpt.md} a \texttt{ai-gemini.md}.
+
+\section{Změny po prvním odevzdání}
+V automatizovaných testech nešly spustit binární soubory pro kontrolu kvality kódu. Do Dockerfile byl 
+přidán jeden řádek, který přidává \texttt{symlinks} a~ostatní potřebné nástroje pro zajištění bezproblémového běhu.
 
 \end{document}
